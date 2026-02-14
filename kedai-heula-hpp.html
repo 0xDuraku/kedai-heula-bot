@@ -2343,18 +2343,25 @@ function exportDetailPDF() {
 
   document.getElementById('print-area').innerHTML = printContent;
   
-  // Mobile Telegram: kasih instruksi karena window.print() diblock
+  // Mobile Telegram: buka di browser external langsung
   const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
   
   if (isMobileOrTelegram() && isTelegram) {
-    alert(`📱 Cara Export PDF di Telegram:
+    // Coba buka di browser external
+    const currentUrl = window.location.href;
+    const printUrl = currentUrl.split('?')[0] + '?print=detail&menu=' + encodeURIComponent(m.nama);
+    
+    if (confirm(`📱 Export PDF tidak tersedia di Telegram Mobile.
 
-1. Tap ⋮ (3 titik) pojok kanan atas
-2. Pilih "Open in Browser"
-3. Di browser: Tap menu → Print → Save as PDF
-
-Atau screenshot halaman ini!`);
-    setTimeout(() => { try { window.print(); } catch(e) {} }, 1000);
+Pilih OK untuk buka halaman ini di browser, atau Cancel untuk screenshot saja.`)) {
+      // Telegram WebApp API untuk buka browser
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.openLink(printUrl);
+      } else {
+        // Fallback: buka dengan window.open
+        window.open(printUrl, '_blank');
+      }
+    }
   } else if (isMobileOrTelegram()) {
     triggerPrintMobile();
   } else {
@@ -4175,18 +4182,22 @@ function exportLaporanPDF() {
 
   document.getElementById('print-area').innerHTML = printContent;
   
-  // Mobile Telegram: kasih instruksi
+  // Mobile Telegram: buka di browser external
   const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
   
   if (isMobileOrTelegram() && isTelegram) {
-    alert(`📱 Cara Export PDF di Telegram:
+    const currentUrl = window.location.href;
+    const printUrl = currentUrl.split('?')[0] + '?print=laporan';
+    
+    if (confirm(`📱 Export PDF tidak tersedia di Telegram Mobile.
 
-1. Tap ⋮ (3 titik) pojok kanan atas
-2. Pilih "Open in Browser"
-3. Di browser: Tap menu → Print → Save as PDF
-
-Atau screenshot halaman ini!`);
-    setTimeout(() => { try { window.print(); } catch(e) {} }, 1000);
+Pilih OK untuk buka halaman ini di browser, atau Cancel untuk screenshot saja.`)) {
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.openLink(printUrl);
+      } else {
+        window.open(printUrl, '_blank');
+      }
+    }
   } else if (isMobileOrTelegram()) {
     triggerPrintMobile();
   } else {
