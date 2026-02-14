@@ -1122,6 +1122,13 @@
     <div class="section-title">📋 Ringkasan Semua Menu</div>
     <div class="section-sub">Semua menu yang sudah dihitung HPP-nya ada di sini.</div>
 
+    <!-- Debug button untuk troubleshoot -->
+    <div style="margin-bottom:12px;">
+      <button class="btn btn-secondary" onclick="debugMenuData()" style="font-size:12px;padding:6px 12px;">
+        🔍 Debug Data (troubleshoot)
+      </button>
+    </div>
+
     <!-- CLOUD SYNC BAR -->
     <div id="sync-bar" style="background:white;border:2px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div style="flex:1;min-width:160px;">
@@ -1964,6 +1971,36 @@ function simpanMenu() {
   }, 300);
 }
 
+function debugMenuData() {
+  const menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  
+  if (menuList.length === 0) {
+    alert('Tidak ada menu tersimpan');
+    return;
+  }
+  
+  let debugInfo = `📊 Total Menu: ${menuList.length}\n\n`;
+  
+  menuList.forEach((m, i) => {
+    debugInfo += `${i + 1}. ${m.nama}\n`;
+    debugInfo += `   HPP: Rp ${(m.hpp || 0).toLocaleString('id-ID')}\n`;
+    debugInfo += `   Foto: ${m.foto ? 'Ada (' + Math.round(m.foto.length/1024) + 'KB)' : 'Kosong'}\n`;
+    debugInfo += `   Bahan: ${(m.bahanRaw || []).length} item\n`;
+    
+    if (m.bahanRaw && m.bahanRaw.length > 0) {
+      m.bahanRaw.forEach(b => {
+        debugInfo += `     - ${b.nama}\n`;
+      });
+    } else {
+      debugInfo += `     (KOSONG!)\n`;
+    }
+    
+    debugInfo += `   Biaya: ${(m.biayaRaw || []).length} item\n\n`;
+  });
+  
+  alert(debugInfo);
+}
+
 function renderRingkasan() {
   menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
   const container = document.getElementById('ringkasan-list');
@@ -2352,6 +2389,10 @@ function editMenu(i) {
   const m = menuList[i];
   if (!m) return;
 
+  console.log('📝 Edit menu:', m.nama);
+  console.log('🧅 bahanRaw:', m.bahanRaw);
+  console.log('⚙️ biayaRaw:', m.biayaRaw);
+
   document.getElementById('edit-idx').value = i;
   document.getElementById('edit-nama').value = m.nama;
   document.getElementById('edit-kategori').value = m.kategori;
@@ -2378,14 +2419,20 @@ function editMenu(i) {
   // Render bahan
   const bahanContainer = document.getElementById('edit-bahan-list');
   bahanContainer.innerHTML = '';
-  (m.bahanRaw || []).forEach((b, j) => {
+  const bahanData = m.bahanRaw || [];
+  console.log(`🔄 Rendering ${bahanData.length} bahan...`);
+  bahanData.forEach((b, j) => {
+    console.log(`  - ${b.nama}: ${b.qty} @ Rp ${b.hargaBeli}`);
     bahanContainer.appendChild(buatEditBahanRow(j, b));
   });
 
   // Render biaya
   const biayaContainer = document.getElementById('edit-biaya-list');
   biayaContainer.innerHTML = '';
-  (m.biayaRaw || []).forEach((b, j) => {
+  const biayaData = m.biayaRaw || [];
+  console.log(`🔄 Rendering ${biayaData.length} biaya...`);
+  biayaData.forEach((b, j) => {
+    console.log(`  - ${b.nama}: Rp ${b.biaya}`);
     biayaContainer.appendChild(buatEditBiayaRow(j, b));
   });
 
