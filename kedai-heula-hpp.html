@@ -6,8 +6,6 @@
 <title>Kalkulator HPP – Kedai Heula</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
     --red: #E03027;
@@ -1124,13 +1122,6 @@
     <div class="section-title">📋 Ringkasan Semua Menu</div>
     <div class="section-sub">Semua menu yang sudah dihitung HPP-nya ada di sini.</div>
 
-    <!-- Debug button untuk troubleshoot -->
-    <div style="margin-bottom:12px;">
-      <button class="btn btn-secondary" onclick="debugMenuData()" style="font-size:12px;padding:6px 12px;">
-        🔍 Debug Data (troubleshoot)
-      </button>
-    </div>
-
     <!-- CLOUD SYNC BAR -->
     <div id="sync-bar" style="background:white;border:2px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div style="flex:1;min-width:160px;">
@@ -1973,36 +1964,6 @@ function simpanMenu() {
   }, 300);
 }
 
-function debugMenuData() {
-  const menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
-  
-  if (menuList.length === 0) {
-    alert('Tidak ada menu tersimpan');
-    return;
-  }
-  
-  let debugInfo = `📊 Total Menu: ${menuList.length}\n\n`;
-  
-  menuList.forEach((m, i) => {
-    debugInfo += `${i + 1}. ${m.nama}\n`;
-    debugInfo += `   HPP: Rp ${(m.hpp || 0).toLocaleString('id-ID')}\n`;
-    debugInfo += `   Foto: ${m.foto ? 'Ada (' + Math.round(m.foto.length/1024) + 'KB)' : 'Kosong'}\n`;
-    debugInfo += `   Bahan: ${(m.bahanRaw || []).length} item\n`;
-    
-    if (m.bahanRaw && m.bahanRaw.length > 0) {
-      m.bahanRaw.forEach(b => {
-        debugInfo += `     - ${b.nama}\n`;
-      });
-    } else {
-      debugInfo += `     (KOSONG!)\n`;
-    }
-    
-    debugInfo += `   Biaya: ${(m.biayaRaw || []).length} item\n\n`;
-  });
-  
-  alert(debugInfo);
-}
-
 function renderRingkasan() {
   menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
   const container = document.getElementById('ringkasan-list');
@@ -2380,13 +2341,12 @@ function exportDetailPDF() {
     </div>
   `;
 
-  // Mobile: download PDF langsung, Desktop: window.print
+  document.getElementById('print-area').innerHTML = printContent;
+  
+  // Trigger print dengan delay di mobile
   if (isMobileOrTelegram()) {
-    const printArea = document.getElementById('print-area');
-    printArea.innerHTML = printContent;
-    downloadPDF(`${m.nama.replace(/[^a-zA-Z0-9]/g, '_')}_Detail_Bahan.pdf`, printArea.innerHTML);
+    triggerPrintMobile();
   } else {
-    document.getElementById('print-area').innerHTML = printContent;
     window.print();
   }
 }
@@ -2632,46 +2592,19 @@ function isMobileOrTelegram() {
   return /mobile|android|iphone|ipad|telegram/i.test(ua) || window.innerWidth < 768;
 }
 
-// Download PDF dari HTML content (untuk mobile)
-async function downloadPDF(filename, htmlContent) {
-  try {
-    showToast('⏳ Membuat PDF...');
-    
-    // Buat temporary container
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.width = '210mm'; // A4 width
-    container.style.padding = '15mm';
-    container.style.background = 'white';
-    container.innerHTML = htmlContent;
-    document.body.appendChild(container);
-    
-    // Convert HTML to canvas
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      useCORS: true,
-      logging: false
-    });
-    
-    document.body.removeChild(container);
-    
-    // Convert canvas to PDF
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    
-    const imgWidth = 210; // A4 width in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    
-    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-    pdf.save(filename);
-    
-    showToast('✅ PDF berhasil diunduh!');
-  } catch (err) {
-    console.error('Error membuat PDF:', err);
-    showToast('❌ Gagal membuat PDF: ' + err.message);
-  }
+// Trigger print dengan delay untuk mobile
+function triggerPrintMobile() {
+  showToast('📄 Membuka dialog print...');
+  
+  // Delay untuk mobile agar content ter-render dulu
+  setTimeout(() => {
+    try {
+      window.print();
+    } catch (e) {
+      showToast('❌ Print gagal. Coba screenshot halaman ini.');
+      console.error('Print error:', e);
+    }
+  }, 500);
 }
 
 // Preview foto yang diupload
@@ -4229,19 +4162,12 @@ function exportLaporanPDF() {
     </div>
   `;
 
-  // Mobile: download PDF langsung, Desktop: window.print
+  document.getElementById('print-area').innerHTML = printContent;
+  
+  // Trigger print dengan delay di mobile
   if (isMobileOrTelegram()) {
-    const printArea = document.getElementById('print-area');
-    printArea.innerHTML = printContent;
-    const periodeName = {
-      'hari': 'Hari_Ini',
-      'minggu': '7_Hari',
-      'bulan': 'Bulan_Ini',
-      'semua': 'Semua'
-    }[currentPeriode] || 'Laporan';
-    downloadPDF(`Laporan_Penjualan_${periodeName}.pdf`, printArea.innerHTML);
+    triggerPrintMobile();
   } else {
-    document.getElementById('print-area').innerHTML = printContent;
     window.print();
   }
 }
