@@ -1181,6 +1181,16 @@
     <div class="section-title">📊 Laporan Penjualan</div>
     <div class="section-sub">Catat transaksi harian dan lihat profit bisnis kamu</div>
 
+    <!-- ACTION BUTTONS -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="exportLaporanPDF()" style="font-size:13px;padding:10px 16px;">
+        📄 Export PDF
+      </button>
+      <button class="btn btn-secondary" onclick="syncTransaksiKeSheets()" style="font-size:13px;padding:10px 16px;">
+        ☁️ Backup Transaksi
+      </button>
+    </div>
+
     <!-- PERIOD SELECTOR -->
     <div class="card" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
@@ -1208,6 +1218,12 @@
           <div style="font-family:'Fredoka One',cursive;font-size:20px;margin-top:4px;" id="lap-item">0</div>
         </div>
       </div>
+    </div>
+
+    <!-- BREAKDOWN PER MENU -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:12px;">📊 Breakdown per Menu</div>
+      <div id="breakdown-menu"></div>
     </div>
 
     <!-- INPUT TRANSAKSI -->
@@ -1908,7 +1924,7 @@ function simpanMenu() {
     porsi: lastSnapshot.porsi,
     kemasan: lastSnapshot.kemasan,
     hpp, hargaJual, margin: 50,
-    tanggal: new Date().toLocaleDateString('id-ID'),
+    tanggal: getWIBDateTimeString(), // WIB timezone
     totalBatch: lastSnapshot.totalBatch,
     bahanRaw: lastSnapshot.bahanRaw || [],
     biayaRaw: lastSnapshot.biayaRaw || [],
@@ -2491,7 +2507,7 @@ function simpanEdit() {
     kategori: document.getElementById('edit-kategori').value,
     porsi, kemasan, bahanRaw, biayaRaw,
     totalBatch, hpp, hargaJual,
-    tanggal: new Date().toLocaleDateString('id-ID'),
+    tanggal: getWIBDateTimeString(), // WIB timezone
   };
 
   localStorage.setItem('kedaiHeula_menu', JSON.stringify(menuList));
@@ -2507,6 +2523,48 @@ function tutupEdit() {
 // =====================
 // HELPERS
 // =====================
+// =====================
+// HELPER FUNCTIONS
+// =====================
+
+// Get current date/time in WIB (UTC+7)
+function getWIBDate() {
+  const now = new Date();
+  // Offset UTC ke WIB (+7 jam = +420 menit)
+  const wibOffset = 7 * 60; // menit
+  const localOffset = now.getTimezoneOffset(); // offset browser dalam menit (negatif untuk timezones di timur UTC)
+  const wibTime = new Date(now.getTime() + (wibOffset + localOffset) * 60000);
+  return wibTime;
+}
+
+// Format WIB date ke YYYY-MM-DD (untuk input type="date")
+function getWIBDateString() {
+  const wib = getWIBDate();
+  const year = wib.getFullYear();
+  const month = String(wib.getMonth() + 1).padStart(2, '0');
+  const day = String(wib.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Format WIB datetime untuk display (DD/MM/YYYY HH:MM)
+function getWIBDateTimeString() {
+  const wib = getWIBDate();
+  return wib.toLocaleString('id-ID', { 
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit', 
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+// Parse tanggal string YYYY-MM-DD dengan asumsi WIB
+function parseWIBDate(dateStr) {
+  // Parse sebagai midnight WIB, bukan UTC
+  return new Date(dateStr + 'T00:00:00+07:00');
+}
+
 function formatRp(num) {
   if (isNaN(num) || !isFinite(num)) return 'Rp 0';
   return 'Rp ' + Math.round(num).toLocaleString('id-ID');
@@ -3056,7 +3114,7 @@ async function syncKeSheets(isTest = false) {
     });
     const result = await res.json();
     if (result.status === 'ok') {
-      const now = new Date().toLocaleString('id-ID');
+      const now = getWIBDateTimeString(); // WIB timezone
       localStorage.setItem('kedaiHeula_lastSync', now);
       updateSyncStatus();
       showToast(isTest ? '✅ Koneksi berhasil! Data tersimpan.' : `✅ Backup berhasil! ${data.length} menu tersimpan.`);
@@ -3155,8 +3213,8 @@ let currentPeriode = 'hari';
 let chartProfit = null;
 
 function initLaporan() {
-  // Set tanggal hari ini
-  document.getElementById('transaksi-tanggal').valueAsDate = new Date();
+  // Set tanggal hari ini (WIB)
+  document.getElementById('transaksi-tanggal').value = getWIBDateString();
   
   // Populate dropdown menu
   const menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
@@ -3169,12 +3227,17 @@ function initLaporan() {
 
 function setTanggalTransaksi(mode) {
   const input = document.getElementById('transaksi-tanggal');
-  const date = new Date();
+  const wib = getWIBDate();
+  
   if (mode === 'kemarin') {
-    date.setDate(date.getDate() - 1);
+    wib.setDate(wib.getDate() - 1);
   }
   // mode 'hari-ini' tidak perlu ubah date
-  input.valueAsDate = date;
+  
+  const year = wib.getFullYear();
+  const month = String(wib.getMonth() + 1).padStart(2, '0');
+  const day = String(wib.getDate()).padStart(2, '0');
+  input.value = `${year}-${month}-${day}`;
 }
 
 function isiHargaTransaksi() {
@@ -3211,7 +3274,7 @@ function simpanTransaksi() {
     hpp: hpp,
     hargaJual: harga,
     profit: (harga - hpp) * qty,
-    timestamp: new Date().toISOString()
+    timestamp: getWIBDateTimeString() // WIB timezone
   };
 
   const listTransaksi = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
@@ -3257,25 +3320,25 @@ function filterTransaksiByPeriode(transaksiList) {
     return transaksiList; // Return semua tanpa filter
   }
   
-  const now = new Date();
-  now.setHours(0, 0, 0, 0); // Reset ke awal hari untuk perbandingan yang tepat
-  const today = now.toISOString().split('T')[0];
+  const wibNow = getWIBDate();
+  wibNow.setHours(0, 0, 0, 0); // Reset ke awal hari
+  const today = getWIBDateString(); // Format YYYY-MM-DD
   
   return transaksiList.filter(t => {
-    const tDate = new Date(t.tanggal + 'T00:00:00'); // Pastikan timezone konsisten
+    const tDate = parseWIBDate(t.tanggal); // Parse dengan timezone WIB
     tDate.setHours(0, 0, 0, 0);
     
     if (currentPeriode === 'hari') {
       return t.tanggal === today;
     } else if (currentPeriode === 'minggu') {
       // 7 hari terakhir termasuk hari ini
-      const weekAgo = new Date(now);
+      const weekAgo = new Date(wibNow);
       weekAgo.setDate(weekAgo.getDate() - 6);
-      return tDate >= weekAgo && tDate <= now;
+      return tDate >= weekAgo && tDate <= wibNow;
     } else {
       // Bulan ini = dari tanggal 1 bulan ini sampai hari ini
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      return tDate >= startOfMonth && tDate <= now;
+      const startOfMonth = new Date(wibNow.getFullYear(), wibNow.getMonth(), 1);
+      return tDate >= startOfMonth && tDate <= wibNow;
     }
   });
 }
@@ -3293,11 +3356,97 @@ function renderLaporan() {
   document.getElementById('lap-transaksi').textContent = totalTransaksi;
   document.getElementById('lap-item').textContent = totalItem + ' pcs';
 
+  // Breakdown per menu
+  renderBreakdownMenu(filtered);
+
   // Chart
   renderChart(filtered);
 
   // Tabel
   renderTabelTransaksi(filtered);
+}
+
+function renderBreakdownMenu(transaksiList) {
+  const container = document.getElementById('breakdown-menu');
+  
+  if (transaksiList.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;">Belum ada transaksi</p>';
+    return;
+  }
+
+  // Group by menu
+  const byMenu = {};
+  transaksiList.forEach(t => {
+    if (!byMenu[t.menu]) {
+      byMenu[t.menu] = { qty: 0, profit: 0, transaksi: 0 };
+    }
+    byMenu[t.menu].qty += t.qty;
+    byMenu[t.menu].profit += t.profit;
+    byMenu[t.menu].transaksi += 1;
+  });
+
+  // Sort by profit descending
+  const menuList = Object.keys(byMenu).map(menu => ({
+    menu: menu,
+    ...byMenu[menu]
+  })).sort((a, b) => b.profit - a.profit);
+
+  const totalProfit = menuList.reduce((s, m) => s + m.profit, 0);
+
+  let html = `<table class="breakdown-table">
+    <thead>
+      <tr>
+        <th>Menu</th>
+        <th class="text-right">Qty Terjual</th>
+        <th class="text-right">Transaksi</th>
+        <th class="text-right">Total Profit</th>
+        <th class="text-right">% Kontribusi</th>
+        <th class="text-right">Avg/Item</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  menuList.forEach((item, idx) => {
+    const avgProfit = item.profit / item.qty;
+    const percentage = totalProfit > 0 ? (item.profit / totalProfit * 100) : 0;
+    const isTop = idx < 3; // Top 3 menu
+    
+    const bgColor = isTop ? '#FFF8E6' : '';
+    const badge = isTop ? ['🥇','🥈','🥉'][idx] : '';
+    
+    html += `<tr style="background:${bgColor};">
+      <td>
+        ${badge ? `<span style="font-size:16px;margin-right:6px;">${badge}</span>` : ''}
+        <strong style="color:${isTop ? 'var(--orange)' : 'inherit'};">${item.menu}</strong>
+      </td>
+      <td class="text-right">${item.qty} pcs</td>
+      <td class="text-right">${item.transaksi}x</td>
+      <td class="text-right" style="font-weight:800;color:var(--green);">${formatRp(item.profit)}</td>
+      <td class="text-right">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+          <div style="background:#E8F5E9;height:20px;width:${Math.min(percentage, 100)}%;min-width:2px;border-radius:4px;"></div>
+          <span style="font-weight:700;font-size:11px;color:var(--green);">${percentage.toFixed(1)}%</span>
+        </div>
+      </td>
+      <td class="text-right">${formatRp(avgProfit)}</td>
+    </tr>`;
+  });
+
+  // Total row
+  const totalQty = menuList.reduce((s, m) => s + m.qty, 0);
+  const totalTransaksi = menuList.reduce((s, m) => s + m.transaksi, 0);
+
+  html += `<tr class="total-row">
+    <td><strong>Total</strong></td>
+    <td class="text-right"><strong>${totalQty} pcs</strong></td>
+    <td class="text-right"><strong>${totalTransaksi}x</strong></td>
+    <td class="text-right"><strong>${formatRp(totalProfit)}</strong></td>
+    <td class="text-right"><strong>100%</strong></td>
+    <td class="text-right">—</td>
+  </tr>`;
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 function renderChart(transaksiList) {
@@ -3393,50 +3542,293 @@ function renderTabelTransaksi(transaksiList) {
     <tbody>`;
 
   transaksiList.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)).forEach(t => {
+    const displayDate = parseWIBDate(t.tanggal).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' });
     html += `<tr>
-      <td>${new Date(t.tanggal + 'T00:00:00').toLocaleDateString('id-ID')}</td>
+      <td>${displayDate}</td>
       <td>${t.menu}</td>
       <td class="text-right">${t.qty} pcs</td>
       <td class="text-right">${formatRp(t.hpp)}</td>
       <td class="text-right">${formatRp(t.hargaJual)}</td>
       <td class="text-right" style="font-weight:800;color:var(--green);">${formatRp(t.profit)}</td>
-      <td><button class="btn-hapus-transaksi" data-id="${t.id}" style="background:var(--red);color:white;border:none;border-radius:6px;font-size:11px;padding:4px 8px;cursor:pointer;font-weight:700;">🗑️</button></td>
+      <td><button class="btn-hapus-transaksi" data-id="${t.id}" title="Klik 2x untuk hapus" style="background:var(--red);color:white;border:none;border-radius:6px;font-size:11px;padding:4px 8px;cursor:pointer;font-weight:700;">🗑️</button></td>
     </tr>`;
   });
 
   html += '</tbody></table>';
   container.innerHTML = html;
 
-  // Attach event listeners ke semua tombol hapus
+  // Attach event listeners dengan double-click protection
   container.querySelectorAll('.btn-hapus-transaksi').forEach(btn => {
+    let clickCount = 0;
+    let clickTimer = null;
+    
     btn.addEventListener('click', function() {
       const id = parseInt(this.getAttribute('data-id'));
-      hapusTransaksi(id);
+      clickCount++;
+      
+      if (clickCount === 1) {
+        // First click - warning visual
+        this.style.background = '#F39C12';
+        this.textContent = '⚠️ Klik lagi';
+        
+        clickTimer = setTimeout(() => {
+          // Reset after 2 seconds
+          clickCount = 0;
+          this.style.background = 'var(--red)';
+          this.textContent = '🗑️';
+        }, 2000);
+        
+      } else if (clickCount === 2) {
+        // Second click - delete
+        clearTimeout(clickTimer);
+        clickCount = 0;
+        
+        let list = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+        const before = list.length;
+        
+        list = list.filter(t => t.id !== id);
+        const after = list.length;
+        
+        if (before === after) {
+          console.error('Transaksi tidak ditemukan, ID:', id);
+          showToast('❌ Transaksi tidak ditemukan');
+          return;
+        }
+        
+        localStorage.setItem('kedaiHeula_transaksi', JSON.stringify(list));
+        console.log(`Transaksi ID ${id} dihapus. Sisa: ${after} transaksi`);
+        
+        renderLaporan();
+        showToast('🗑️ Transaksi dihapus');
+      }
     });
   });
 }
 
-function hapusTransaksi(id) {
-  if (!confirm('Hapus transaksi ini?')) return;
-  
-  // Reload dari localStorage untuk hindari stale data
-  let list = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
-  const before = list.length;
-  
-  list = list.filter(t => t.id !== id);
-  const after = list.length;
-  
-  if (before === after) {
-    console.error('Transaksi tidak ditemukan, ID:', id);
-    showToast('❌ Transaksi tidak ditemukan');
+// =====================
+// EXPORT LAPORAN PDF
+// =====================
+
+function syncTransaksiKeSheets() {
+  const url = getSheetsUrl();
+  if (!url) {
+    alert('Setup Google Sheets dulu di tab Ringkasan Menu → Setup Cloud Backup');
     return;
   }
+
+  const allTransaksi = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+  if (allTransaksi.length === 0) {
+    showToast('⚠️ Tidak ada transaksi untuk di-backup');
+    return;
+  }
+
+  if (!confirm(`Backup ${allTransaksi.length} transaksi ke Google Sheets?`)) return;
+
+  const origText = 'Menyimpan...';
+  showToast('☁️ ' + origText);
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'backup_transaksi', data: allTransaksi })
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (result.status === 'ok') {
+      const now = getWIBDateTimeString();
+      localStorage.setItem('kedaiHeula_lastSyncTransaksi', now);
+      showToast(`✅ Backup transaksi berhasil! ${allTransaksi.length} transaksi tersimpan.`);
+    } else {
+      throw new Error(result.message || 'Unknown error');
+    }
+  })
+  .catch(e => {
+    showToast('❌ Gagal backup transaksi: ' + e.message);
+    console.error(e);
+  });
+}
+
+function exportLaporanPDF() {
+  const allTransaksi = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+  const filtered = filterTransaksiByPeriode(allTransaksi);
   
-  localStorage.setItem('kedaiHeula_transaksi', JSON.stringify(list));
-  console.log(`Transaksi ID ${id} dihapus. Sisa: ${after} transaksi`);
-  
-  renderLaporan();
-  showToast('🗑️ Transaksi dihapus');
+  if (filtered.length === 0) {
+    showToast('⚠️ Tidak ada transaksi untuk di-export');
+    return;
+  }
+
+  // Summary data
+  const totalProfit = filtered.reduce((s, t) => s + t.profit, 0);
+  const totalTransaksi = filtered.length;
+  const totalItem = filtered.reduce((s, t) => s + t.qty, 0);
+
+  // Breakdown per menu
+  const byMenu = {};
+  filtered.forEach(t => {
+    if (!byMenu[t.menu]) {
+      byMenu[t.menu] = { qty: 0, profit: 0, transaksi: 0 };
+    }
+    byMenu[t.menu].qty += t.qty;
+    byMenu[t.menu].profit += t.profit;
+    byMenu[t.menu].transaksi += 1;
+  });
+
+  const menuList = Object.keys(byMenu).map(menu => ({
+    menu: menu,
+    ...byMenu[menu]
+  })).sort((a, b) => b.profit - a.profit);
+
+  // Periode label
+  const periodeLabel = {
+    'hari': 'Hari Ini',
+    'minggu': '7 Hari Terakhir',
+    'bulan': 'Bulan Ini',
+    'semua': 'Semua Periode'
+  }[currentPeriode] || 'Periode Terpilih';
+
+  const tanggalCetak = getWIBDateTimeString();
+
+  // Build breakdown table
+  let breakdownRows = '';
+  menuList.forEach((item, idx) => {
+    const avgProfit = item.profit / item.qty;
+    const percentage = totalProfit > 0 ? (item.profit / totalProfit * 100) : 0;
+    const isTop = idx < 3;
+    const badge = isTop ? ['🥇','🥈','🥉'][idx] : '';
+    
+    breakdownRows += `
+      <tr style="background:${isTop ? '#FFF8E6' : 'white'};">
+        <td>${badge} <strong>${item.menu}</strong></td>
+        <td class="pr-num">${item.qty} pcs</td>
+        <td class="pr-num">${item.transaksi}x</td>
+        <td class="pr-num"><strong>${formatRp(item.profit)}</strong></td>
+        <td class="pr-num">${percentage.toFixed(1)}%</td>
+        <td class="pr-num">${formatRp(avgProfit)}</td>
+      </tr>`;
+  });
+
+  // Build transaksi table
+  let transaksiRows = '';
+  filtered.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)).forEach(t => {
+    const displayDate = parseWIBDate(t.tanggal).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' });
+    transaksiRows += `
+      <tr>
+        <td>${displayDate}</td>
+        <td>${t.menu}</td>
+        <td class="pr-num">${t.qty} pcs</td>
+        <td class="pr-num">${formatRp(t.hpp)}</td>
+        <td class="pr-num">${formatRp(t.hargaJual)}</td>
+        <td class="pr-num"><strong>${formatRp(t.profit)}</strong></td>
+      </tr>`;
+  });
+
+  const printContent = `
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: Arial, sans-serif; color: #1A1A1A; font-size: 12px; }
+
+      .doc-header { display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 3px solid #E03027; margin-bottom: 16px; }
+      .brand { font-size: 18px; font-weight: 900; color: #E03027; }
+      .brand-sub { font-size: 9px; color: #888; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+      .doc-meta { text-align: right; }
+      .doc-meta .meta-title { font-size: 14px; font-weight: 900; }
+      .doc-meta .meta-sub { font-size: 9px; color: #888; margin-top: 2px; }
+
+      .summary-bar { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+      .sum-box { background: #FFF8F0; border: 2px solid #F0E0CC; border-radius: 8px; padding: 10px; text-align: center; }
+      .sum-label { font-size: 8px; font-weight: 700; color: #888; text-transform: uppercase; display: block; }
+      .sum-value { font-size: 14px; font-weight: 900; color: #E03027; display: block; margin-top: 3px; }
+
+      h3 { font-size: 12px; font-weight: 900; color: #E03027; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 2px solid #F0E0CC; }
+      h3:first-of-type { margin-top: 0; }
+      
+      table { width: 100%; border-collapse: collapse; margin-bottom: 4px; font-size: 10px; }
+      thead tr { background: #F47C20 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead th { padding: 6px 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+      tbody tr:nth-child(even) { background: #FFF8F0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      tbody td { padding: 6px 8px; border-bottom: 1px solid #F0E0CC; }
+      .pr-num { text-align: right; }
+      .total-row td { background: #FFF3E0 !important; font-weight: 700; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      .doc-footer { margin-top: 16px; padding-top: 8px; border-top: 2px solid #F0E0CC; display: flex; justify-content: space-between; font-size: 9px; color: #aaa; }
+    </style>
+
+    <div class="doc-header">
+      <div>
+        <div class="brand">🍱 Kedai Heula</div>
+        <div class="brand-sub">Laporan Penjualan</div>
+      </div>
+      <div class="doc-meta">
+        <div class="meta-title">${periodeLabel}</div>
+        <div class="meta-sub">${totalTransaksi} transaksi · ${totalItem} pcs terjual</div>
+      </div>
+    </div>
+
+    <div class="summary-bar">
+      <div class="sum-box">
+        <span class="sum-label">💰 Total Profit</span>
+        <span class="sum-value">${formatRp(totalProfit)}</span>
+      </div>
+      <div class="sum-box">
+        <span class="sum-label">📦 Total Transaksi</span>
+        <span class="sum-value">${totalTransaksi}</span>
+      </div>
+      <div class="sum-box">
+        <span class="sum-label">🍱 Item Terjual</span>
+        <span class="sum-value">${totalItem} pcs</span>
+      </div>
+    </div>
+
+    <h3>📊 Breakdown per Menu</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Menu</th>
+          <th class="pr-num">Qty</th>
+          <th class="pr-num">Transaksi</th>
+          <th class="pr-num">Total Profit</th>
+          <th class="pr-num">% Kontribusi</th>
+          <th class="pr-num">Avg/Item</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${breakdownRows}
+        <tr class="total-row">
+          <td><strong>Total</strong></td>
+          <td class="pr-num"><strong>${totalItem} pcs</strong></td>
+          <td class="pr-num"><strong>${totalTransaksi}x</strong></td>
+          <td class="pr-num"><strong>${formatRp(totalProfit)}</strong></td>
+          <td class="pr-num"><strong>100%</strong></td>
+          <td class="pr-num">—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>📋 Riwayat Transaksi</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Menu</th>
+          <th class="pr-num">Qty</th>
+          <th class="pr-num">HPP</th>
+          <th class="pr-num">Harga Jual</th>
+          <th class="pr-num">Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${transaksiRows}
+      </tbody>
+    </table>
+
+    <div class="doc-footer">
+      <span>Kedai Heula – Laporan Penjualan</span>
+      <span>Dicetak: ${tanggalCetak}</span>
+    </div>
+  `;
+
+  document.getElementById('print-area').innerHTML = printContent;
+  window.print();
 }
 
 // Init: sudah digabung di window.onload di atas
