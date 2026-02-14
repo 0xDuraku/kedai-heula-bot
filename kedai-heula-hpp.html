@@ -1083,23 +1083,56 @@
 
       <!-- SARAN HARGA JUAL -->
       <div class="price-suggestion">
-        <h4>✅ Saran Harga Jual (termasuk margin profit)</h4>
-        <div class="price-grid">
-          <div class="price-option" onclick="pilihHarga(this)" data-margin="30">
-            <div class="po-label">🟡 Ekonomis</div>
-            <div class="po-value" id="harga-30">Rp 0</div>
-            <div class="po-margin">Margin 30%</div>
+        <h4>💡 Rekomendasi Harga Jual</h4>
+        
+        <!-- Header kolom -->
+        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px;font-weight:700;color:#666;">
+          <div></div>
+          <div style="text-align:center;">🏪 OFFLINE</div>
+          <div style="text-align:center;">📱 ONLINE<br><span style="font-size:9px;font-weight:400;">(GoFood/Shopee)</span></div>
+        </div>
+
+        <!-- Row 1: Ekonomis -->
+        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
+            🟡 EKONOMIS<br><span style="font-size:10px;font-weight:400;color:#999;">Margin 30%</span>
           </div>
-          <div class="price-option" onclick="pilihHarga(this)" data-margin="50">
-            <div class="po-label">🟢 Standar</div>
-            <div class="po-value" id="harga-50">Rp 0</div>
-            <div class="po-margin">Margin 50%</div>
+          <div class="price-option" onclick="pilihHarga(this, 'offline')" data-margin="30" style="margin:0;">
+            <div class="po-value" id="harga-30-offline">Rp 0</div>
           </div>
-          <div class="price-option" onclick="pilihHarga(this)" data-margin="70">
-            <div class="po-label">🔥 Premium</div>
-            <div class="po-value" id="harga-70">Rp 0</div>
-            <div class="po-margin">Margin 70%</div>
+          <div class="price-option" onclick="pilihHarga(this, 'online')" data-margin="30" style="margin:0;">
+            <div class="po-value" id="harga-30-online">Rp 0</div>
           </div>
+        </div>
+
+        <!-- Row 2: Standar (recommended) -->
+        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
+            🟢 STANDAR<br><span style="font-size:10px;font-weight:400;color:#999;">Margin 50%</span>
+          </div>
+          <div class="price-option recommended" onclick="pilihHarga(this, 'offline')" data-margin="50" style="margin:0;border:2px solid #4CAF50;">
+            <div class="po-value" id="harga-50-offline">Rp 0</div>
+          </div>
+          <div class="price-option recommended" onclick="pilihHarga(this, 'online')" data-margin="50" style="margin:0;border:2px solid #4CAF50;">
+            <div class="po-value" id="harga-50-online">Rp 0</div>
+          </div>
+        </div>
+
+        <!-- Row 3: Premium -->
+        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;">
+          <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
+            🔥 PREMIUM<br><span style="font-size:10px;font-weight:400;color:#999;">Margin 70%</span>
+          </div>
+          <div class="price-option" onclick="pilihHarga(this, 'offline')" data-margin="70" style="margin:0;">
+            <div class="po-value" id="harga-70-offline">Rp 0</div>
+          </div>
+          <div class="price-option" onclick="pilihHarga(this, 'online')" data-margin="70" style="margin:0;">
+            <div class="po-value" id="harga-70-online">Rp 0</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:#666;margin-top:10px;padding-top:10px;border-top:1px solid #ddd;">
+          ℹ️ <strong>Harga online 25% lebih tinggi</strong> untuk cover platform fee ~20%.
         </div>
       </div>
 
@@ -1412,7 +1445,7 @@
 
         <div class="info-box" style="margin-bottom:16px;">
           <span class="info-icon">ℹ️</span>
-          <div>Pilih item dari <strong>Ringkasan Menu</strong> — HPP dan harga jual otomatis terisi. Bisa edit manual kalau perlu.</div>
+          <div>Pilih item dari <strong>Ringkasan Menu</strong> — HPP dan harga jual otomatis terisi.</div>
         </div>
 
         <div class="bundle-item-header">
@@ -1425,21 +1458,7 @@
         <div id="bundle-list"></div>
         <button class="btn btn-add" onclick="tambahBundleItem()">＋ Tambah Item dari Ringkasan</button>
 
-        <div style="height:16px;"></div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Harga Jual Paket (Rp)</label>
-            <input type="number" id="b-harga-paket" placeholder="25000" min="0" oninput="hitungBundling()" />
-          </div>
-          <div class="form-group">
-            <label>Platform Fee (%) — GoFood/Shopee</label>
-            <input type="number" id="b-platform-fee" value="20" min="0" max="100" oninput="hitungBundling()" />
-          </div>
-        </div>
-
-        <button class="btn btn-primary" onclick="hitungBundling()" style="margin-top:4px;">🧮 Hitung Bundling</button>
-
-        <div id="bundling-result" style="display:none; margin-top:16px;"></div>
+        <div id="bundling-result" style="margin-top:16px;"></div>
       </div>
     </div>
 
@@ -1885,10 +1904,20 @@ function hitungHPP() {
   document.getElementById('res-hpp').textContent = formatRp(hpp);
   document.getElementById('res-bep').textContent = formatRp(bep);
 
-  // Saran harga jual - bulatkan ke kelipatan yang realistis
-  document.getElementById('harga-30').textContent = formatRp(roundHargaMakanan(hpp / (1 - 0.30)));
-  document.getElementById('harga-50').textContent = formatRp(roundHargaMakanan(hpp / (1 - 0.50)));
-  document.getElementById('harga-70').textContent = formatRp(roundHargaMakanan(hpp / (1 - 0.70)));
+  // Saran harga jual - offline & online
+  const harga30 = roundHargaMakanan(hpp / (1 - 0.30));
+  const harga50 = roundHargaMakanan(hpp / (1 - 0.50));
+  const harga70 = roundHargaMakanan(hpp / (1 - 0.70));
+
+  // Offline (harga normal)
+  document.getElementById('harga-30-offline').textContent = formatRp(harga30);
+  document.getElementById('harga-50-offline').textContent = formatRp(harga50);
+  document.getElementById('harga-70-offline').textContent = formatRp(harga70);
+
+  // Online (markup 25% untuk cover fee 20%)
+  document.getElementById('harga-30-online').textContent = formatRp(roundHargaMakanan(harga30 * 1.25));
+  document.getElementById('harga-50-online').textContent = formatRp(roundHargaMakanan(harga50 * 1.25));
+  document.getElementById('harga-70-online').textContent = formatRp(roundHargaMakanan(harga70 * 1.25));
 
   // Breakdown table
   const tbody = document.getElementById('breakdown-body');
@@ -2040,22 +2069,45 @@ function renderRingkasan() {
 
         <!-- Rekomendasi harga -->
         <div style="background:var(--bg);border-radius:12px;padding:12px;">
-          <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">💡 Rekomendasi Harga Jual</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-            <div style="background:linear-gradient(135deg,#FFF9E6,#FFF3CC);border:2px solid ${Math.round(hj)===h30?'#F5C518':'#F0E0CC'};border-radius:10px;padding:8px 6px;text-align:center;">
-              <div style="font-size:9px;font-weight:800;color:#B8860B;">🟡 EKONOMIS</div>
-              <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--dark);margin:2px 0;">${formatRp(h30)}</div>
-              <div style="font-size:9px;color:var(--muted);font-weight:700;">Margin 30%</div>
+          <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">💡 Rekomendasi Harga</div>
+          
+          <!-- Header kolom -->
+          <div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:6px;margin-bottom:6px;font-size:9px;font-weight:700;color:#666;">
+            <div></div>
+            <div style="text-align:center;">🏪 OFFLINE</div>
+            <div style="text-align:center;">📱 ONLINE</div>
+          </div>
+
+          <!-- Ekonomis -->
+          <div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:6px;margin-bottom:4px;">
+            <div style="font-size:8px;font-weight:700;color:#999;display:flex;align-items:center;">🟡 30%</div>
+            <div style="background:#FFF9E6;border:1px solid #F0E0CC;border-radius:6px;padding:6px;text-align:center;">
+              <div style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--dark);">${formatRp(h30)}</div>
             </div>
-            <div style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border:2px solid ${Math.round(hj)===h50?'#27AE60':'#F0E0CC'};border-radius:10px;padding:8px 6px;text-align:center;">
-              <div style="font-size:9px;font-weight:800;color:#1B5E20;">🟢 STANDAR</div>
-              <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--dark);margin:2px 0;">${formatRp(h50)}</div>
-              <div style="font-size:9px;color:var(--muted);font-weight:700;">Margin 50%</div>
+            <div style="background:#FFF9E6;border:1px solid #F0E0CC;border-radius:6px;padding:6px;text-align:center;">
+              <div style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--dark);">${formatRp(roundHargaMakanan(h30*1.25))}</div>
             </div>
-            <div style="background:linear-gradient(135deg,#FFF0EF,#FFD5D3);border:2px solid ${Math.round(hj)===h70?'var(--red)':'#F0E0CC'};border-radius:10px;padding:8px 6px;text-align:center;">
-              <div style="font-size:9px;font-weight:800;color:var(--red);">🔥 PREMIUM</div>
-              <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--dark);margin:2px 0;">${formatRp(h70)}</div>
-              <div style="font-size:9px;color:var(--muted);font-weight:700;">Margin 70%</div>
+          </div>
+
+          <!-- Standar -->
+          <div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:6px;margin-bottom:4px;">
+            <div style="font-size:8px;font-weight:700;color:#999;display:flex;align-items:center;">🟢 50%</div>
+            <div style="background:#E8F5E9;border:2px solid ${Math.round(hj)===h50?'#27AE60':'#C8E6C9'};border-radius:6px;padding:6px;text-align:center;">
+              <div style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--dark);">${formatRp(h50)}</div>
+            </div>
+            <div style="background:#E8F5E9;border:2px solid ${Math.round(hj)===roundHargaMakanan(h50*1.25)?'#27AE60':'#C8E6C9'};border-radius:6px;padding:6px;text-align:center;">
+              <div style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--dark);">${formatRp(roundHargaMakanan(h50*1.25))}</div>
+            </div>
+          </div>
+
+          <!-- Premium -->
+          <div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:6px;">
+            <div style="font-size:8px;font-weight:700;color:#999;display:flex;align-items:center;">🔥 70%</div>
+            <div style="background:#FFF0EF;border:1px solid #F0E0CC;border-radius:6px;padding:6px;text-align:center;">
+              <div style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--dark);">${formatRp(h70)}</div>
+            </div>
+            <div style="background:#FFF0EF;border:1px solid #F0E0CC;border-radius:6px;padding:6px;text-align:center;">
+              <div style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--dark);">${formatRp(roundHargaMakanan(h70*1.25))}</div>
             </div>
           </div>
         </div>
@@ -2783,10 +2835,22 @@ function getCategoryLabel(cat) {
   return map[cat] || cat;
 }
 
-function pilihHarga(el) {
-  document.querySelectorAll('.price-option').forEach(p => p.style.borderColor = '#D1FAE5');
+function pilihHarga(el, type) {
+  // Reset semua border di row yang sama
+  const parent = el.parentElement;
+  parent.querySelectorAll('.price-option').forEach(p => {
+    p.style.borderColor = '#D1FAE5';
+    p.style.background = 'white';
+  });
+  
+  // Highlight yang diklik
   el.style.borderColor = 'var(--green)';
   el.style.background = '#F0FDF4';
+  
+  // Toast feedback
+  const margin = el.getAttribute('data-margin');
+  const typeLabel = type === 'online' ? 'Online (GoFood/Shopee)' : 'Offline';
+  showToast(`✅ Dipilih: ${typeLabel} - Margin ${margin}%`);
 }
 
 function resetForm() {
@@ -3000,12 +3064,9 @@ function tambahBundleItem() {
   div.className = 'bundle-item-row';
   div.id = 'bundle-' + id;
   div.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <select onchange="isiBundle(${id}, this)" style="font-size:12px;padding:8px 10px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;background:var(--bg);outline:none;">
-        ${getBundleMenuOptions()}
-      </select>
-      <input type="text" id="bname-${id}" placeholder="atau ketik nama manual..." style="font-size:12px;" oninput="hitungBundling()" />
-    </div>
+    <select onchange="isiBundle(${id}, this)" style="font-size:13px;padding:10px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;background:var(--bg);outline:none;width:100%;">
+      ${getBundleMenuOptions()}
+    </select>
     <div style="display:flex;flex-direction:column;gap:4px;">
       <div id="bhpp-display-${id}" style="font-size:10px;font-weight:800;color:var(--muted);padding:2px 4px;min-height:16px;"></div>
       <input type="number" id="bhpp-${id}" min="0" step="any" placeholder="HPP/pcs" oninput="hitungBundling()" style="font-size:13px;" />
@@ -3028,11 +3089,12 @@ function isiBundle(id, selectEl) {
   const menu = data[parseInt(idx)];
   if (!menu) return;
 
-  document.getElementById('bname-' + id).value = menu.nama;
+  // Set HPP dan Harga Jual
   document.getElementById('bhpp-' + id).value = Math.round(menu.hpp);
   document.getElementById('bhj-' + id).value = Math.round(menu.hargaJual);
   document.getElementById('bhpp-display-' + id).textContent = 'HPP: ' + formatRp(menu.hpp);
   document.getElementById('bhj-display-' + id).innerHTML = '💰 Jual: ' + formatRp(menu.hargaJual);
+  
   hitungBundling();
 }
 
@@ -3042,9 +3104,6 @@ function hapusBundleItem(id) {
 }
 
 function hitungBundling() {
-  const hargaPaket = parseFloat(document.getElementById('b-harga-paket').value) || 0;
-  const platformFee = parseFloat(document.getElementById('b-platform-fee').value) || 0;
-
   let totalHPP = 0;
   let totalHargaJualNormal = 0;
   const itemDetail = [];
@@ -3056,19 +3115,19 @@ function hitungBundling() {
     if (!idMatch) return;
     const id = idMatch[1];
 
-    const namaInput = document.getElementById('bname-' + id);
+    const selectEl  = row.querySelector('select');
     const hppInput  = document.getElementById('bhpp-' + id);
     const hjInput   = document.getElementById('bhj-' + id);
     const qtyInput  = document.getElementById('bqty-' + id);
 
-    if (!namaInput || !hppInput) return;
+    if (!selectEl || !hppInput) return;
 
-    const nama  = namaInput.value.trim();
+    const nama  = selectEl.options[selectEl.selectedIndex]?.text || '';
     const hpp   = parseFloat(hppInput.value) || 0;
     const hj    = parseFloat(hjInput ? hjInput.value : 0) || 0;
     const qty   = parseFloat(qtyInput ? qtyInput.value : 1) || 1;
 
-    if (!nama || hpp === 0) return;
+    if (!nama || hpp === 0 || selectEl.value === '') return;
 
     const subtotalHPP = hpp * qty;
     const subtotalHJ  = hj * qty;
@@ -3077,14 +3136,136 @@ function hitungBundling() {
     itemDetail.push({ nama, hpp, hj, qty, subtotalHPP, subtotalHJ });
   });
 
-  if (totalHPP === 0 || hargaPaket === 0) {
+  if (totalHPP === 0) {
     document.getElementById('bundling-result').style.display = 'none';
     return;
   }
 
-  const pendapatanBersih = hargaPaket * (1 - platformFee / 100);
-  const profit = pendapatanBersih - totalHPP;
-  const margin = pendapatanBersih > 0 ? (profit / pendapatanBersih) * 100 : 0;
+  const platformFee = 20; // Platform fee default GoFood/Shopee
+
+  // REKOMENDASI OFFLINE (tanpa platform fee)
+  const offlineHemat = roundHargaMakanan(totalHPP / (1 - 0.10)); // Margin 10%
+  const offlineStandar = roundHargaMakanan(totalHPP / (1 - 0.25)); // Margin 25%
+  const offlinePremium = roundHargaMakanan(totalHPP / (1 - 0.35)); // Margin 35%
+
+  // REKOMENDASI ONLINE (dengan platform fee, markup 1.25x dari offline)
+  const onlineHemat = roundHargaMakanan(offlineHemat * 1.25); // 25% markup dari offline
+  const onlineStandar = roundHargaMakanan(offlineStandar * 1.25);
+  const onlinePremium = roundHargaMakanan(offlinePremium * 1.25);
+
+  // Hitung profit untuk setiap skenario
+  const profitOfflineHemat = offlineHemat - totalHPP;
+  const profitOfflineStandar = offlineStandar - totalHPP;
+  const profitOfflinePremium = offlinePremium - totalHPP;
+
+  const profitOnlineHemat = (onlineHemat * (1 - platformFee/100)) - totalHPP;
+  const profitOnlineStandar = (onlineStandar * (1 - platformFee/100)) - totalHPP;
+  const profitOnlinePremium = (onlinePremium * (1 - platformFee/100)) - totalHPP;
+
+  const normalInfo = totalHargaJualNormal > 0
+    ? `<div style="font-size:12px;color:#666;margin-bottom:12px;">💰 Total harga satuan: <strong>${formatRp(totalHargaJualNormal)}</strong> → hemat <strong>${formatRp(totalHargaJualNormal - offlineStandar)}</strong> dengan paket standar</div>`
+    : '';
+
+  const el = document.getElementById('bundling-result');
+  el.style.display = 'block';
+  el.innerHTML = `
+    ${normalInfo}
+    
+    <div style="background:#FFF3E0;border-left:4px solid #FF9800;padding:14px;border-radius:8px;margin-bottom:12px;">
+      <div style="font-weight:800;color:#E65100;margin-bottom:10px;">💡 Rekomendasi Harga Bundling</div>
+      
+      <!-- Header kolom -->
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px;font-weight:700;color:#666;">
+        <div></div>
+        <div style="text-align:center;">🏪 OFFLINE</div>
+        <div style="text-align:center;">📱 ONLINE<br><span style="font-size:9px;font-weight:400;">(GoFood/Shopee)</span></div>
+      </div>
+
+      <!-- Row 1: Hemat -->
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
+          🟡 HEMAT<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~10%</span>
+        </div>
+        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+          <div style="font-weight:800;color:#E65100;font-size:16px;">${formatRp(offlineHemat)}</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflineHemat)}</div>
+        </div>
+        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+          <div style="font-weight:800;color:#E65100;font-size:16px;">${formatRp(onlineHemat)}</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlineHemat)}</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Standar (recommended) -->
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
+          🟢 STANDAR<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~25%</span>
+        </div>
+        <div style="background:#E8F5E9;padding:10px;border-radius:8px;text-align:center;border:2px solid #4CAF50;">
+          <div style="font-weight:800;color:#2E7D32;font-size:16px;">${formatRp(offlineStandar)}</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflineStandar)}</div>
+        </div>
+        <div style="background:#E8F5E9;padding:10px;border-radius:8px;text-align:center;border:2px solid #4CAF50;">
+          <div style="font-weight:800;color:#2E7D32;font-size:16px;">${formatRp(onlineStandar)}</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlineStandar)}</div>
+        </div>
+      </div>
+
+      <!-- Row 3: Premium -->
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;">
+        <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
+          🔥 PREMIUM<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~35%</span>
+        </div>
+        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+          <div style="font-weight:800;color:#1976D2;font-size:16px;">${formatRp(offlinePremium)}</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflinePremium)}</div>
+        </div>
+        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+          <div style="font-weight:800;color:#1976D2;font-size:16px;">${formatRp(onlinePremium)}</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlinePremium)}</div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:#666;margin-top:10px;padding-top:10px;border-top:1px solid #ddd;">
+        ℹ️ <strong>Harga online 25% lebih tinggi</strong> untuk cover platform fee ~20%. Profit tetap sama antara offline & online.
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px;">🔍 Detail Item Bundling</div>
+      <table class="breakdown-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">HPP/pcs</th>
+            <th class="text-right">Harga Jual/pcs</th>
+            <th class="text-right">Subtotal HPP</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemDetail.map(i => `
+            <tr>
+              <td>${i.nama}</td>
+              <td class="text-right">${i.qty}x</td>
+              <td class="text-right">${formatRp(i.hpp)}</td>
+              <td class="text-right">${i.hj > 0 ? formatRp(i.hj) : '<span style="color:var(--muted)">—</span>'}</td>
+              <td class="text-right">${formatRp(i.subtotalHPP)}</td>
+            </tr>`).join('')}
+          <tr style="border-top:2px solid var(--border);font-weight:800;">
+            <td colspan="4" style="text-align:right;padding-top:8px;">Total HPP Paket:</td>
+            <td class="text-right" style="padding-top:8px;color:var(--red);">${formatRp(totalHPP)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// =====================
+// PROMO - BELI X GRATIS Y
+// =====================
+function hitungBeliGratis() {
   // Gunakan harga jual normal aktual kalau tersedia, fallback ke estimasi margin 50%
   const hargaNormalRef = totalHargaJualNormal > 0 ? totalHargaJualNormal : totalHPP / (1 - 0.5);
   const diskonEfektif = hargaNormalRef > 0 ? ((hargaNormalRef - hargaPaket) / hargaNormalRef) * 100 : 0;
