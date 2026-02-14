@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalkulator HPP – Kedai Heula</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
     --red: #E03027;
@@ -925,6 +926,9 @@
   <button class="tab-btn" onclick="switchTab('ringkasan')">
     <span class="tab-emoji">📋</span> <span>Ringkasan Menu</span>
   </button>
+  <button class="tab-btn" onclick="switchTab('laporan')">
+    <span class="tab-emoji">📊</span> <span>Laporan</span>
+  </button>
   <button class="tab-btn" onclick="switchTab('promo')">
     <span class="tab-emoji">🏷️</span> <span>Kalkulator Promo</span>
   </button>
@@ -1169,6 +1173,99 @@
         <button class="btn btn-secondary" onclick="tutupSyncConfig()">Batal</button>
         <button class="btn btn-primary" onclick="simpanSyncConfig()">💾 Simpan & Test</button>
       </div>
+    </div>
+  </div>
+
+  <!-- TAB LAPORAN PENJUALAN -->
+  <div id="tab-laporan" class="tab-content">
+    <div class="section-title">📊 Laporan Penjualan</div>
+    <div class="section-sub">Catat transaksi harian dan lihat profit bisnis kamu</div>
+
+    <!-- PERIOD SELECTOR -->
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div style="font-size:15px;font-weight:800;color:var(--dark);">📅 Periode Laporan</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" onclick="setPeriodeLaporan('hari')" id="btn-period-hari" style="font-size:12px;padding:6px 14px;">Hari Ini</button>
+          <button class="btn btn-secondary" onclick="setPeriodeLaporan('minggu')" id="btn-period-minggu" style="font-size:12px;padding:6px 14px;">7 Hari</button>
+          <button class="btn btn-secondary" onclick="setPeriodeLaporan('bulan')" id="btn-period-bulan" style="font-size:12px;padding:6px 14px;">Bulan Ini</button>
+          <button class="btn btn-secondary" onclick="setPeriodeLaporan('semua')" id="btn-period-semua" style="font-size:12px;padding:6px 14px;">Semua</button>
+        </div>
+      </div>
+      
+      <!-- SUMMARY CARDS -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">
+        <div style="background:linear-gradient(135deg,#27AE60,#2ECC71);border-radius:12px;padding:14px;color:white;">
+          <div style="font-size:10px;opacity:0.85;font-weight:800;text-transform:uppercase;">💰 Total Profit</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:20px;margin-top:4px;" id="lap-profit">Rp 0</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#2980B9,#3498DB);border-radius:12px;padding:14px;color:white;">
+          <div style="font-size:10px;opacity:0.85;font-weight:800;text-transform:uppercase;">📦 Total Transaksi</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:20px;margin-top:4px;" id="lap-transaksi">0</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#E67E22,#F39C12);border-radius:12px;padding:14px;color:white;">
+          <div style="font-size:10px;opacity:0.85;font-weight:800;text-transform:uppercase;">🍱 Item Terjual</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:20px;margin-top:4px;" id="lap-item">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT TRANSAKSI -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:12px;">➕ Catat Transaksi Baru</div>
+      
+      <div class="info-box" style="background:#E8F5E9;border-left:4px solid var(--green);padding:10px 12px;border-radius:10px;margin-bottom:14px;font-size:12px;">
+        <span style="font-size:16px;">💡</span>
+        <div style="margin-left:8px;"><strong>Input transaksi masa lalu:</strong> Kamu bisa input transaksi kemarin atau tanggal lain dengan ganti tanggal secara manual. Gunakan tombol shortcut <strong>Kemarin</strong> untuk cepat.</div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tanggal</label>
+          <div style="display:flex;gap:6px;align-items:stretch;">
+            <input type="date" id="transaksi-tanggal" style="flex:1;padding:8px 10px;border-radius:8px;border:2px solid var(--border);font-size:13px;" />
+            <button class="btn btn-secondary" onclick="setTanggalTransaksi('kemarin')" style="font-size:11px;padding:6px 10px;white-space:nowrap;">Kemarin</button>
+            <button class="btn btn-secondary" onclick="setTanggalTransaksi('hari-ini')" style="font-size:11px;padding:6px 10px;white-space:nowrap;">Hari Ini</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Menu</label>
+          <select id="transaksi-menu" onchange="isiHargaTransaksi()" style="width:100%;padding:8px 10px;border-radius:8px;border:2px solid var(--border);font-size:13px;">
+            <option value="">-- Pilih Menu --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row three">
+        <div class="form-group">
+          <label>Jumlah (pcs)</label>
+          <input type="number" id="transaksi-qty" min="1" value="1" style="width:100%;padding:8px 10px;border-radius:8px;border:2px solid var(--border);font-size:13px;" />
+        </div>
+        <div class="form-group">
+          <label>HPP/pcs</label>
+          <input type="number" id="transaksi-hpp" readonly style="width:100%;padding:8px 10px;border-radius:8px;border:2px solid var(--border);font-size:13px;background:#F5F5F5;" />
+        </div>
+        <div class="form-group">
+          <label>Harga Jual/pcs</label>
+          <input type="number" id="transaksi-harga" style="width:100%;padding:8px 10px;border-radius:8px;border:2px solid var(--border);font-size:13px;" />
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn btn-primary" onclick="simpanTransaksi()">💾 Simpan Transaksi</button>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:12px;">📈 Tren Profit</div>
+      <canvas id="chart-profit" style="max-height:280px;"></canvas>
+    </div>
+
+    <!-- TABEL TRANSAKSI -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px;">📋 Riwayat Transaksi</div>
+      <div id="tabel-transaksi" style="overflow-x:auto;"></div>
     </div>
   </div>
 
@@ -1640,6 +1737,7 @@ function switchTab(id) {
   document.getElementById('tab-' + id).classList.add('active');
   event.currentTarget.classList.add('active');
   if (id === 'ringkasan') { renderRingkasan(); updateSyncStatus(); }
+  if (id === 'laporan') initLaporan();
   if (id === 'promo') { refreshDropdownDiskon(); refreshAllBundleDropdowns(); }
 }
 
@@ -3047,6 +3145,276 @@ async function restoreFromSheets() {
     btnRestore.innerHTML = origText;
     btnRestore.disabled = false;
   }
+}
+
+// =====================
+// LAPORAN PENJUALAN
+// =====================
+
+let currentPeriode = 'hari';
+let chartProfit = null;
+
+function initLaporan() {
+  // Set tanggal hari ini
+  document.getElementById('transaksi-tanggal').valueAsDate = new Date();
+  
+  // Populate dropdown menu
+  const menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const select = document.getElementById('transaksi-menu');
+  select.innerHTML = '<option value="">-- Pilih Menu --</option>' +
+    menuList.map((m, i) => `<option value="${i}">${m.nama} (${formatRp(m.hargaJual)})</option>`).join('');
+  
+  setPeriodeLaporan('semua'); // Default: tampilkan semua transaksi
+}
+
+function setTanggalTransaksi(mode) {
+  const input = document.getElementById('transaksi-tanggal');
+  const date = new Date();
+  if (mode === 'kemarin') {
+    date.setDate(date.getDate() - 1);
+  }
+  // mode 'hari-ini' tidak perlu ubah date
+  input.valueAsDate = date;
+}
+
+function isiHargaTransaksi() {
+  const idx = parseInt(document.getElementById('transaksi-menu').value);
+  if (isNaN(idx)) return;
+  const menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const m = menuList[idx];
+  if (!m) return;
+  document.getElementById('transaksi-hpp').value = m.hpp;
+  document.getElementById('transaksi-harga').value = m.hargaJual;
+}
+
+function simpanTransaksi() {
+  const tanggal = document.getElementById('transaksi-tanggal').value;
+  const menuIdx = parseInt(document.getElementById('transaksi-menu').value);
+  const qty     = parseInt(document.getElementById('transaksi-qty').value) || 0;
+  const hpp     = parseFloat(document.getElementById('transaksi-hpp').value) || 0;
+  const harga   = parseFloat(document.getElementById('transaksi-harga').value) || 0;
+
+  if (!tanggal || isNaN(menuIdx) || qty <= 0 || hpp <= 0 || harga <= 0) {
+    alert('Isi semua field dengan benar');
+    return;
+  }
+
+  const menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const menu = menuList[menuIdx];
+  if (!menu) return;
+
+  const transaksi = {
+    id: Date.now(),
+    tanggal: tanggal,
+    menu: menu.nama,
+    qty: qty,
+    hpp: hpp,
+    hargaJual: harga,
+    profit: (harga - hpp) * qty,
+    timestamp: new Date().toISOString()
+  };
+
+  const listTransaksi = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+  listTransaksi.push(transaksi);
+  localStorage.setItem('kedaiHeula_transaksi', JSON.stringify(listTransaksi));
+
+  console.log('Transaksi tersimpan:', transaksi);
+  console.log('Total transaksi di localStorage:', listTransaksi.length);
+
+  showToast(`✅ Transaksi tersimpan! Profit: ${formatRp(transaksi.profit)}`);
+  
+  // Reset form
+  document.getElementById('transaksi-qty').value = 1;
+  document.getElementById('transaksi-menu').value = '';
+  document.getElementById('transaksi-hpp').value = '';
+  document.getElementById('transaksi-harga').value = '';
+  
+  // Re-render laporan untuk update tampilan
+  renderLaporan();
+}
+
+function setPeriodeLaporan(periode) {
+  currentPeriode = periode;
+  ['hari', 'minggu', 'bulan', 'semua'].forEach(p => {
+    const btn = document.getElementById(`btn-period-${p}`);
+    if (btn) {
+      if (p === periode) {
+        btn.style.background = 'linear-gradient(135deg, var(--red), var(--orange))';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'transparent';
+      } else {
+        btn.style.background = 'white';
+        btn.style.color = 'var(--dark)';
+        btn.style.borderColor = 'var(--border)';
+      }
+    }
+  });
+  renderLaporan();
+}
+
+function filterTransaksiByPeriode(transaksiList) {
+  if (currentPeriode === 'semua') {
+    return transaksiList; // Return semua tanpa filter
+  }
+  
+  const now = new Date();
+  now.setHours(0, 0, 0, 0); // Reset ke awal hari untuk perbandingan yang tepat
+  const today = now.toISOString().split('T')[0];
+  
+  return transaksiList.filter(t => {
+    const tDate = new Date(t.tanggal + 'T00:00:00'); // Pastikan timezone konsisten
+    tDate.setHours(0, 0, 0, 0);
+    
+    if (currentPeriode === 'hari') {
+      return t.tanggal === today;
+    } else if (currentPeriode === 'minggu') {
+      // 7 hari terakhir termasuk hari ini
+      const weekAgo = new Date(now);
+      weekAgo.setDate(weekAgo.getDate() - 6);
+      return tDate >= weekAgo && tDate <= now;
+    } else {
+      // Bulan ini = dari tanggal 1 bulan ini sampai hari ini
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      return tDate >= startOfMonth && tDate <= now;
+    }
+  });
+}
+
+function renderLaporan() {
+  const allTransaksi = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+  const filtered = filterTransaksiByPeriode(allTransaksi);
+
+  // Summary
+  const totalProfit = filtered.reduce((s, t) => s + t.profit, 0);
+  const totalTransaksi = filtered.length;
+  const totalItem = filtered.reduce((s, t) => s + t.qty, 0);
+
+  document.getElementById('lap-profit').textContent = formatRp(totalProfit);
+  document.getElementById('lap-transaksi').textContent = totalTransaksi;
+  document.getElementById('lap-item').textContent = totalItem + ' pcs';
+
+  // Chart
+  renderChart(filtered);
+
+  // Tabel
+  renderTabelTransaksi(filtered);
+}
+
+function renderChart(transaksiList) {
+  const ctx = document.getElementById('chart-profit');
+  if (!ctx) return;
+
+  if (transaksiList.length === 0) {
+    if (chartProfit) chartProfit.destroy();
+    ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+    return;
+  }
+
+  // Group by date
+  const byDate = {};
+  transaksiList.forEach(t => {
+    if (!byDate[t.tanggal]) byDate[t.tanggal] = 0;
+    byDate[t.tanggal] += t.profit;
+  });
+
+  // Sort tanggal ascending (dari lama ke baru)
+  const dates = Object.keys(byDate).sort((a, b) => new Date(a) - new Date(b));
+  const profits = dates.map(d => byDate[d]);
+
+  // Format label tanggal
+  const labels = dates.map(d => {
+    const date = new Date(d + 'T00:00:00');
+    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+  });
+
+  if (chartProfit) chartProfit.destroy();
+
+  chartProfit = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Profit (Rp)',
+        data: profits,
+        borderColor: '#E03027',
+        backgroundColor: 'rgba(224, 48, 39, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.3,
+        pointBackgroundColor: '#E03027',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => 'Profit: Rp ' + ctx.parsed.y.toLocaleString('id-ID')
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: val => 'Rp ' + val.toLocaleString('id-ID')
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderTabelTransaksi(transaksiList) {
+  const container = document.getElementById('tabel-transaksi');
+  if (transaksiList.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;">Belum ada transaksi</p>';
+    return;
+  }
+
+  let html = `<table class="breakdown-table">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Menu</th>
+        <th class="text-right">Qty</th>
+        <th class="text-right">HPP</th>
+        <th class="text-right">Harga Jual</th>
+        <th class="text-right">Profit</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  transaksiList.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)).forEach(t => {
+    html += `<tr>
+      <td>${new Date(t.tanggal).toLocaleDateString('id-ID')}</td>
+      <td>${t.menu}</td>
+      <td class="text-right">${t.qty} pcs</td>
+      <td class="text-right">${formatRp(t.hpp)}</td>
+      <td class="text-right">${formatRp(t.hargaJual)}</td>
+      <td class="text-right" style="font-weight:800;color:var(--green);">${formatRp(t.profit)}</td>
+      <td><button class="btn btn-danger" style="font-size:11px;padding:4px 8px;" onclick="hapusTransaksi(${t.id})">🗑️</button></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function hapusTransaksi(id) {
+  if (!confirm('Hapus transaksi ini?')) return;
+  let list = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+  list = list.filter(t => t.id !== id);
+  localStorage.setItem('kedaiHeula_transaksi', JSON.stringify(list));
+  renderLaporan();
+  showToast('🗑️ Transaksi dihapus');
 }
 
 // Init: sudah digabung di window.onload di atas
