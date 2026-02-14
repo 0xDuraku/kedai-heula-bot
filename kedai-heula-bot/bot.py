@@ -19,8 +19,9 @@ from telegram.ext import (
 )
 
 # ─── KONFIGURASI — isi dua baris ini ────────────────────────────────────────
+import os
 BOT_TOKEN = "8243503971:AAGzGIjjBaW2CIZKQD9BrwnLXnRdpWS26tE"
-APP_URL   = "https://0xDuraku.github.io/kedai-heula/kedai-heula-hpp.html"
+APP_URL   = "https://0xDuraku.github.io/kedai-heula-bot/kedai-heula-hpp.html"
 # ────────────────────────────────────────────────────────────────────────────
 
 logging.basicConfig(
