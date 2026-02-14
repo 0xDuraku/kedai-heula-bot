@@ -2588,13 +2588,19 @@ function previewFoto(input, previewId) {
     const reader = new FileReader();
     
     reader.onload = function(e) {
-      currentFotoBase64 = e.target.result;
-      preview.innerHTML = `
-        <div style="position:relative;display:inline-block;">
-          <img src="${e.target.result}" style="max-width:200px;max-height:200px;border-radius:12px;border:2px solid var(--border);" />
-          <button onclick="hapusFoto('${previewId}', '${input.id}')" style="position:absolute;top:4px;right:4px;background:var(--red);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:bold;font-size:12px;">×</button>
-        </div>
-      `;
+      // Kompres foto untuk sync ke Sheets
+      kompresGambar(e.target.result, 400, 400, 0.7, (compressed) => {
+        currentFotoBase64 = compressed; // Simpan yang sudah dikompres
+        
+        // Preview pakai original quality
+        preview.innerHTML = `
+          <div style="position:relative;display:inline-block;">
+            <img src="${e.target.result}" style="max-width:200px;max-height:200px;border-radius:12px;border:2px solid var(--border);" />
+            <button onclick="hapusFoto('${previewId}', '${input.id}')" style="position:absolute;top:4px;right:4px;background:var(--red);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:bold;font-size:12px;">×</button>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">✓ Foto dikompres untuk sync</div>
+          </div>
+        `;
+      });
     };
     
     reader.readAsDataURL(file);
@@ -2602,6 +2608,36 @@ function previewFoto(input, previewId) {
     preview.innerHTML = '';
     currentFotoBase64 = null;
   }
+}
+
+// Kompres gambar untuk mengurangi ukuran base64
+function kompresGambar(base64, maxWidth, maxHeight, quality, callback) {
+  const img = new Image();
+  
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    let width = img.width;
+    let height = img.height;
+    
+    // Hitung resize ratio
+    if (width > maxWidth || height > maxHeight) {
+      const ratio = Math.min(maxWidth / width, maxHeight / height);
+      width = width * ratio;
+      height = height * ratio;
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+    
+    // Convert ke base64 dengan kompresi
+    const compressed = canvas.toDataURL('image/jpeg', quality);
+    callback(compressed);
+  };
+  
+  img.src = base64;
 }
 
 // Hapus foto
