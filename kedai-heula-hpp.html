@@ -2588,19 +2588,29 @@ function previewFoto(input, previewId) {
     const reader = new FileReader();
     
     reader.onload = function(e) {
-      // Kompres foto untuk sync ke Sheets
-      kompresGambar(e.target.result, 400, 400, 0.7, (compressed) => {
-        currentFotoBase64 = compressed; // Simpan yang sudah dikompres
-        
-        // Preview pakai original quality
-        preview.innerHTML = `
-          <div style="position:relative;display:inline-block;">
-            <img src="${e.target.result}" style="max-width:200px;max-height:200px;border-radius:12px;border:2px solid var(--border);" />
-            <button onclick="hapusFoto('${previewId}', '${input.id}')" style="position:absolute;top:4px;right:4px;background:var(--red);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:bold;font-size:12px;">×</button>
-            <div style="font-size:10px;color:var(--muted);margin-top:4px;">✓ Foto dikompres untuk sync</div>
-          </div>
-        `;
-      });
+      const original = e.target.result;
+      
+      // Tampilkan preview dulu (pakai original)
+      preview.innerHTML = `
+        <div style="position:relative;display:inline-block;">
+          <img src="${original}" style="max-width:200px;max-height:200px;border-radius:12px;border:2px solid var(--border);" />
+          <button onclick="hapusFoto('${previewId}', '${input.id}')" style="position:absolute;top:4px;right:4px;background:var(--red);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:bold;font-size:12px;">×</button>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;">⏳ Mengompres foto...</div>
+        </div>
+      `;
+      
+      // Kompres foto untuk sync (async)
+      try {
+        kompresGambar(original, 400, 400, 0.7, (compressed) => {
+          currentFotoBase64 = compressed;
+          // Update preview message
+          const msg = preview.querySelector('div[style*="font-size:10px"]');
+          if (msg) msg.textContent = '✓ Siap untuk sync';
+        });
+      } catch (err) {
+        console.error('Kompresi gagal, pakai original:', err);
+        currentFotoBase64 = original; // Fallback ke original
+      }
     };
     
     reader.readAsDataURL(file);
@@ -2612,32 +2622,47 @@ function previewFoto(input, previewId) {
 
 // Kompres gambar untuk mengurangi ukuran base64
 function kompresGambar(base64, maxWidth, maxHeight, quality, callback) {
-  const img = new Image();
-  
-  img.onload = function() {
-    const canvas = document.createElement('canvas');
-    let width = img.width;
-    let height = img.height;
+  try {
+    const img = new Image();
     
-    // Hitung resize ratio
-    if (width > maxWidth || height > maxHeight) {
-      const ratio = Math.min(maxWidth / width, maxHeight / height);
-      width = width * ratio;
-      height = height * ratio;
-    }
+    img.onerror = function() {
+      console.error('Gagal load image untuk kompresi');
+      callback(base64); // Fallback ke original
+    };
     
-    canvas.width = width;
-    canvas.height = height;
+    img.onload = function() {
+      try {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // Hitung resize ratio
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert ke base64 dengan kompresi
+        const compressed = canvas.toDataURL('image/jpeg', quality);
+        callback(compressed);
+      } catch (err) {
+        console.error('Gagal kompres canvas:', err);
+        callback(base64); // Fallback ke original
+      }
+    };
     
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, width, height);
-    
-    // Convert ke base64 dengan kompresi
-    const compressed = canvas.toDataURL('image/jpeg', quality);
-    callback(compressed);
-  };
-  
-  img.src = base64;
+    img.src = base64;
+  } catch (err) {
+    console.error('Error di kompresGambar:', err);
+    callback(base64); // Fallback ke original
+  }
 }
 
 // Hapus foto
@@ -3274,6 +3299,14 @@ async function syncKeSheets(isTest = false) {
     debugLog('🔄 Mulai backup...');
     debugLog('📍 URL: ' + url.substring(0, 50) + '...');
     debugLog('📦 Data: ' + data.length + ' menu');
+    
+    // Log ukuran foto untuk debug
+    data.forEach((item, i) => {
+      if (item.foto) {
+        const sizeKB = Math.round(item.foto.length / 1024);
+        debugLog(`📸 ${item.nama}: foto ${sizeKB}KB`);
+      }
+    });
     
     const res = await fetch(url, {
       method: 'POST',
