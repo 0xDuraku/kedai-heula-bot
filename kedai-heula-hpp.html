@@ -2343,8 +2343,19 @@ function exportDetailPDF() {
 
   document.getElementById('print-area').innerHTML = printContent;
   
-  // Trigger print dengan delay di mobile
-  if (isMobileOrTelegram()) {
+  // Mobile Telegram: kasih instruksi karena window.print() diblock
+  const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
+  
+  if (isMobileOrTelegram() && isTelegram) {
+    alert(`📱 Cara Export PDF di Telegram:
+
+1. Tap ⋮ (3 titik) pojok kanan atas
+2. Pilih "Open in Browser"
+3. Di browser: Tap menu → Print → Save as PDF
+
+Atau screenshot halaman ini!`);
+    setTimeout(() => { try { window.print(); } catch(e) {} }, 1000);
+  } else if (isMobileOrTelegram()) {
     triggerPrintMobile();
   } else {
     window.print();
@@ -4164,8 +4175,19 @@ function exportLaporanPDF() {
 
   document.getElementById('print-area').innerHTML = printContent;
   
-  // Trigger print dengan delay di mobile
-  if (isMobileOrTelegram()) {
+  // Mobile Telegram: kasih instruksi
+  const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
+  
+  if (isMobileOrTelegram() && isTelegram) {
+    alert(`📱 Cara Export PDF di Telegram:
+
+1. Tap ⋮ (3 titik) pojok kanan atas
+2. Pilih "Open in Browser"
+3. Di browser: Tap menu → Print → Save as PDF
+
+Atau screenshot halaman ini!`);
+    setTimeout(() => { try { window.print(); } catch(e) {} }, 1000);
+  } else if (isMobileOrTelegram()) {
     triggerPrintMobile();
   } else {
     window.print();
