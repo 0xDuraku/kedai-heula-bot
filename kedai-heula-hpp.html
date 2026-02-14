@@ -969,6 +969,11 @@
           </select>
         </div>
       </div>
+      <div class="form-group">
+        <label>Foto Menu (Opsional)</label>
+        <input type="file" id="foto-menu" accept="image/*" onchange="previewFoto(this, 'preview-foto')" style="width:100%;padding:8px 10px;border-radius:8px;border:2px solid var(--border);font-size:13px;" />
+        <div id="preview-foto" style="margin-top:8px;"></div>
+      </div>
       <div class="form-row three">
         <div class="form-group">
           <label>Porsi / Batch (pcs)</label>
@@ -1667,6 +1672,12 @@
         </div>
       </div>
 
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Foto Menu</label>
+        <input type="file" id="edit-foto-menu" accept="image/*" onchange="previewFoto(this, 'preview-edit-foto')" style="width:100%;padding:8px 10px;border-radius:8px;border:2px solid var(--border);font-size:13px;" />
+        <div id="preview-edit-foto" style="margin-top:8px;"></div>
+      </div>
+
       <div class="form-row" style="margin-bottom:16px;">
         <div class="form-group">
           <label>Porsi / Batch (pcs)</label>
@@ -1854,16 +1865,16 @@ function hitungHPP() {
   });
 
   const totalKemasan = kemasan * porsi;
-  const totalBatch = totalBahan + totalKemasan + totalOperasional;
-  const hpp = totalBatch / porsi;
-  const bep = hpp / (1 - 0.30);
+  const totalBatch = Math.round(totalBahan + totalKemasan + totalOperasional);
+  const hpp = Math.round(totalBatch / porsi);
+  const bep = Math.round(hpp / (1 - 0.30));
 
   lastHPP = hpp;
   lastPorsi = porsi;
   lastNama = nama;
 
   // Simpan snapshot lengkap untuk disimpan ke ringkasan
-  lastSnapshot = { nama, kategori, porsi, kemasan, bahanRaw, biayaRaw, totalBatch, hpp };
+  lastSnapshot = { nama, kategori, porsi, kemasan, bahanRaw, biayaRaw, totalBatch, hpp, foto: currentFotoBase64 };
 
   // Update UI
   document.getElementById('res-total-batch').textContent = formatRp(totalBatch);
@@ -1871,10 +1882,10 @@ function hitungHPP() {
   document.getElementById('res-hpp').textContent = formatRp(hpp);
   document.getElementById('res-bep').textContent = formatRp(bep);
 
-  // Saran harga jual
-  document.getElementById('harga-30').textContent = formatRp(hpp / (1 - 0.30));
-  document.getElementById('harga-50').textContent = formatRp(hpp / (1 - 0.50));
-  document.getElementById('harga-70').textContent = formatRp(hpp / (1 - 0.70));
+  // Saran harga jual - bulatkan ke kelipatan yang realistis
+  document.getElementById('harga-30').textContent = formatRp(roundHargaMakanan(hpp / (1 - 0.30)));
+  document.getElementById('harga-50').textContent = formatRp(roundHargaMakanan(hpp / (1 - 0.50)));
+  document.getElementById('harga-70').textContent = formatRp(roundHargaMakanan(hpp / (1 - 0.70)));
 
   // Breakdown table
   const tbody = document.getElementById('breakdown-body');
@@ -1920,7 +1931,7 @@ function simpanMenu() {
   const nama = lastSnapshot.nama || document.getElementById('nama-menu').value.trim() || 'Menu Tanpa Nama';
   const kategori = lastSnapshot.kategori || document.getElementById('kategori-menu').value;
   const hpp = lastHPP;
-  const hargaJual = hpp / (1 - 0.50);
+  const hargaJual = roundHargaMakanan(hpp / (1 - 0.50));
 
   const obj = {
     nama, kategori,
@@ -1931,6 +1942,7 @@ function simpanMenu() {
     totalBatch: lastSnapshot.totalBatch,
     bahanRaw: lastSnapshot.bahanRaw || [],
     biayaRaw: lastSnapshot.biayaRaw || [],
+    foto: lastSnapshot.foto || null, // Simpan foto base64
   };
 
   const existing = menuList.findIndex(m => m.nama === nama);
@@ -1994,15 +2006,20 @@ function renderRingkasan() {
     const hj = m.hargaJual;
     const profit = hj - m.hpp;
     const hasBahan = m.bahanRaw && m.bahanRaw.length > 0;
-    const h30 = Math.round(m.hpp / (1 - 0.30));
-    const h50 = Math.round(m.hpp / (1 - 0.50));
-    const h70 = Math.round(m.hpp / (1 - 0.70));
+    const h30 = roundHargaMakanan(m.hpp / (1 - 0.30));
+    const h50 = roundHargaMakanan(m.hpp / (1 - 0.50));
+    const h70 = roundHargaMakanan(m.hpp / (1 - 0.70));
     const bep  = Math.round(m.hpp / (1 - 0.30));
     html += `
       <div class="menu-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:14px;">
-        <!-- Baris atas: info + angka -->
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div class="mc-left" style="flex:1;">
+        <!-- Baris atas: foto + info + angka -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+          ${m.foto ? `
+            <div style="flex-shrink:0;">
+              <img src="${m.foto}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid var(--border);" />
+            </div>
+          ` : ''}
+          <div class="mc-left" style="flex:1;min-width:200px;">
             <div class="mc-name">${m.nama}</div>
             <div style="margin-top:4px;">
               <span class="tag tag-${m.kategori}">${getCategoryLabel(m.kategori)}</span>
@@ -2193,9 +2210,9 @@ function exportDetailPDF() {
   const totalBiaya   = (m.biayaRaw  || []).reduce((s, b) => s + b.biaya, 0);
   const totalKemasan = (m.kemasan   || 0) * (m.porsi || 1);
   const totalBatch   = m.totalBatch || (totalBahan + totalBiaya + totalKemasan);
-  const h30 = Math.round(m.hpp / (1 - 0.30));
-  const h50 = Math.round(m.hpp / (1 - 0.50));
-  const h70 = Math.round(m.hpp / (1 - 0.70));
+  const h30 = roundHargaMakanan(m.hpp / (1 - 0.30));
+  const h50 = roundHargaMakanan(m.hpp / (1 - 0.50));
+  const h70 = roundHargaMakanan(m.hpp / (1 - 0.70));
   const bep = Math.round(m.hpp / (1 - 0.30));
 
   const bahanRows = (m.bahanRaw || []).map(b => `
@@ -2339,6 +2356,22 @@ function editMenu(i) {
   document.getElementById('edit-kemasan').value = m.kemasan || 0;
   document.getElementById('edit-harga-jual').value = Math.round(m.hargaJual);
 
+  // Load foto jika ada
+  const previewEdit = document.getElementById('preview-edit-foto');
+  if (m.foto) {
+    currentFotoBase64 = m.foto; // Set foto saat ini
+    previewEdit.innerHTML = `
+      <div style="position:relative;display:inline-block;">
+        <img src="${m.foto}" style="max-width:200px;max-height:200px;border-radius:12px;border:2px solid var(--border);" />
+        <button onclick="hapusFoto('preview-edit-foto', 'edit-foto-menu')" style="position:absolute;top:4px;right:4px;background:var(--red);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:bold;font-size:12px;">×</button>
+      </div>
+    `;
+  } else {
+    currentFotoBase64 = null;
+    previewEdit.innerHTML = '';
+    document.getElementById('edit-foto-menu').value = '';
+  }
+
   // Render bahan
   const bahanContainer = document.getElementById('edit-bahan-list');
   bahanContainer.innerHTML = '';
@@ -2420,13 +2453,13 @@ function hitungEditHPP() {
   });
 
   const totalKemasan = kemasan * porsi;
-  const totalBatch = totalBahan + totalKemasan + totalBiaya;
-  const hpp = totalBatch / porsi;
-  const bep = hpp / (1 - 0.30);
+  const totalBatch = Math.round(totalBahan + totalKemasan + totalBiaya);
+  const hpp = Math.round(totalBatch / porsi);
+  const bep = Math.round(hpp / (1 - 0.30));
 
-  const h30 = hpp / (1 - 0.30);
-  const h50 = hpp / (1 - 0.50);
-  const h70 = hpp / (1 - 0.70);
+  const h30 = roundHargaMakanan(hpp / (1 - 0.30));
+  const h50 = roundHargaMakanan(hpp / (1 - 0.50));
+  const h70 = roundHargaMakanan(hpp / (1 - 0.70));
 
   document.getElementById('edit-hpp-preview').innerHTML = hpp <= 0 ? '—' : `
     <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px;">
@@ -2511,6 +2544,7 @@ function simpanEdit() {
     porsi, kemasan, bahanRaw, biayaRaw,
     totalBatch, hpp, hargaJual,
     tanggal: getWIBDateTimeString(), // WIB timezone
+    foto: currentFotoBase64, // Update foto (bisa null jika dihapus)
   };
 
   localStorage.setItem('kedaiHeula_menu', JSON.stringify(menuList));
@@ -2529,6 +2563,50 @@ function tutupEdit() {
 // =====================
 // HELPER FUNCTIONS
 // =====================
+
+let currentFotoBase64 = null; // Store foto saat ini
+
+// Preview foto yang diupload
+function previewFoto(input, previewId) {
+  const preview = document.getElementById(previewId);
+  
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    
+    // Validasi ukuran (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Ukuran foto terlalu besar! Maksimal 2MB.');
+      input.value = '';
+      preview.innerHTML = '';
+      currentFotoBase64 = null;
+      return;
+    }
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+      currentFotoBase64 = e.target.result;
+      preview.innerHTML = `
+        <div style="position:relative;display:inline-block;">
+          <img src="${e.target.result}" style="max-width:200px;max-height:200px;border-radius:12px;border:2px solid var(--border);" />
+          <button onclick="hapusFoto('${previewId}', '${input.id}')" style="position:absolute;top:4px;right:4px;background:var(--red);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:bold;font-size:12px;">×</button>
+        </div>
+      `;
+    };
+    
+    reader.readAsDataURL(file);
+  } else {
+    preview.innerHTML = '';
+    currentFotoBase64 = null;
+  }
+}
+
+// Hapus foto
+function hapusFoto(previewId, inputId) {
+  document.getElementById(previewId).innerHTML = '';
+  document.getElementById(inputId).value = '';
+  currentFotoBase64 = null;
+}
 
 // Get current date/time in WIB (UTC+7)
 function getWIBDate() {
@@ -2568,6 +2646,25 @@ function parseWIBDate(dateStr) {
   return new Date(dateStr + 'T00:00:00+07:00');
 }
 
+// Bulatkan harga makanan ke kelipatan yang lebih realistis
+function roundHargaMakanan(harga) {
+  const rounded = Math.round(harga);
+  
+  if (rounded < 1000) {
+    // Di bawah 1000: bulatkan ke kelipatan 100
+    return Math.round(rounded / 100) * 100;
+  } else if (rounded < 5000) {
+    // 1000-5000: bulatkan ke kelipatan 500
+    return Math.round(rounded / 500) * 500;
+  } else if (rounded < 10000) {
+    // 5000-10000: bulatkan ke kelipatan 1000
+    return Math.round(rounded / 1000) * 1000;
+  } else {
+    // Di atas 10000: bulatkan ke kelipatan 1000
+    return Math.round(rounded / 1000) * 1000;
+  }
+}
+
 function formatRp(num) {
   if (isNaN(num) || !isFinite(num)) return 'Rp 0';
   return 'Rp ' + Math.round(num).toLocaleString('id-ID');
@@ -2591,6 +2688,12 @@ function resetForm() {
   document.getElementById('bahan-list').innerHTML = '';
   document.getElementById('biaya-list').innerHTML = '';
   document.getElementById('hasil-section').style.display = 'none';
+  
+  // Reset foto
+  document.getElementById('foto-menu').value = '';
+  document.getElementById('preview-foto').innerHTML = '';
+  currentFotoBase64 = null;
+  
   bahanCount = 0; biayaCount = 0;
   tambahBahan(); tambahBahan(); tambahBahan();
   tambahBiaya();
