@@ -3204,7 +3204,7 @@ function simpanTransaksi() {
   if (!menu) return;
 
   const transaksi = {
-    id: Date.now(),
+    id: Date.now() + Math.floor(Math.random() * 1000), // Tambah random untuk hindari collision
     tanggal: tanggal,
     menu: menu.nama,
     qty: qty,
@@ -3394,25 +3394,47 @@ function renderTabelTransaksi(transaksiList) {
 
   transaksiList.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)).forEach(t => {
     html += `<tr>
-      <td>${new Date(t.tanggal).toLocaleDateString('id-ID')}</td>
+      <td>${new Date(t.tanggal + 'T00:00:00').toLocaleDateString('id-ID')}</td>
       <td>${t.menu}</td>
       <td class="text-right">${t.qty} pcs</td>
       <td class="text-right">${formatRp(t.hpp)}</td>
       <td class="text-right">${formatRp(t.hargaJual)}</td>
       <td class="text-right" style="font-weight:800;color:var(--green);">${formatRp(t.profit)}</td>
-      <td><button class="btn btn-danger" style="font-size:11px;padding:4px 8px;" onclick="hapusTransaksi(${t.id})">🗑️</button></td>
+      <td><button class="btn-hapus-transaksi" data-id="${t.id}" style="background:var(--red);color:white;border:none;border-radius:6px;font-size:11px;padding:4px 8px;cursor:pointer;font-weight:700;">🗑️</button></td>
     </tr>`;
   });
 
   html += '</tbody></table>';
   container.innerHTML = html;
+
+  // Attach event listeners ke semua tombol hapus
+  container.querySelectorAll('.btn-hapus-transaksi').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const id = parseInt(this.getAttribute('data-id'));
+      hapusTransaksi(id);
+    });
+  });
 }
 
 function hapusTransaksi(id) {
   if (!confirm('Hapus transaksi ini?')) return;
+  
+  // Reload dari localStorage untuk hindari stale data
   let list = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+  const before = list.length;
+  
   list = list.filter(t => t.id !== id);
+  const after = list.length;
+  
+  if (before === after) {
+    console.error('Transaksi tidak ditemukan, ID:', id);
+    showToast('❌ Transaksi tidak ditemukan');
+    return;
+  }
+  
   localStorage.setItem('kedaiHeula_transaksi', JSON.stringify(list));
+  console.log(`Transaksi ID ${id} dihapus. Sisa: ${after} transaksi`);
+  
   renderLaporan();
   showToast('🗑️ Transaksi dihapus');
 }
