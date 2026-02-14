@@ -1113,11 +1113,61 @@
     <div class="section-title">📋 Ringkasan Semua Menu</div>
     <div class="section-sub">Semua menu yang sudah dihitung HPP-nya ada di sini.</div>
 
+    <!-- CLOUD SYNC BAR -->
+    <div id="sync-bar" style="background:white;border:2px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:160px;">
+        <div style="font-size:13px;font-weight:800;color:var(--dark);">☁️ Cloud Backup (Google Sheets)</div>
+        <div id="sync-status" style="font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;">Belum dikonfigurasi</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary" style="font-size:12px;padding:8px 14px;" onclick="bukaSyncConfig()">⚙️ Setup</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:8px 14px;" onclick="syncKeSheets()" id="btn-sync">⬆️ Backup</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:8px 14px;" onclick="restoreFromSheets()" id="btn-restore">⬇️ Restore</button>
+      </div>
+    </div>
+
     <div id="ringkasan-list">
       <div class="empty-state">
         <div class="es-icon">🍱</div>
         <p>Belum ada menu tersimpan</p>
         <small>Hitung HPP dulu di tab "Hitung HPP", lalu klik "Simpan ke Ringkasan Menu"</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SYNC CONFIG -->
+  <div class="modal-overlay" id="modal-sync" onclick="if(event.target===this)tutupSyncConfig()">
+    <div class="modal-box" style="max-width:520px;">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ Setup Cloud Backup</div>
+        <button class="modal-close" onclick="tutupSyncConfig()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-box" style="background:#E3F2FD;border-left:4px solid #2196F3;padding:12px 14px;border-radius:10px;margin-bottom:16px;font-size:13px;">
+          <span style="font-size:18px;">💡</span>
+          <div style="margin-left:10px;">Data kamu akan disimpan ke <strong>Google Sheets</strong> milikmu sendiri via Google Apps Script. Gratis, tidak ada pihak ketiga yang akses data kamu.</div>
+        </div>
+
+        <div style="font-size:13px;font-weight:800;margin-bottom:10px;color:var(--dark);">Langkah setup (sekali saja):</div>
+        <ol style="font-size:13px;color:#444;padding-left:18px;line-height:2;">
+          <li>Buka <a href="https://sheets.new" target="_blank" style="color:var(--red);font-weight:700;">sheets.new</a> untuk buat Google Sheet baru</li>
+          <li>Di Sheet, klik menu <strong>Extensions → Apps Script</strong></li>
+          <li>Hapus kode yang ada, paste kode dari file <code>apps-script.gs</code></li>
+          <li>Klik <strong>Deploy → New deployment → Web app</strong></li>
+          <li>Execute as: <strong>Me</strong> · Who has access: <strong>Anyone</strong> → Deploy</li>
+          <li>Copy URL yang muncul, paste di bawah ini</li>
+        </ol>
+
+        <div class="form-group" style="margin-top:14px;">
+          <label style="font-size:13px;font-weight:800;">URL Apps Script Web App</label>
+          <input type="text" id="sheets-url-input"
+            placeholder="https://script.google.com/macros/s/xxx/exec"
+            style="width:100%;padding:10px 12px;border-radius:8px;border:2px solid var(--border);font-size:13px;margin-top:6px;outline:none;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="tutupSyncConfig()">Batal</button>
+        <button class="btn btn-primary" onclick="simpanSyncConfig()">💾 Simpan & Test</button>
       </div>
     </div>
   </div>
@@ -1589,7 +1639,7 @@ function switchTab(id) {
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   event.currentTarget.classList.add('active');
-  if (id === 'ringkasan') renderRingkasan();
+  if (id === 'ringkasan') { renderRingkasan(); updateSyncStatus(); }
   if (id === 'promo') { refreshDropdownDiskon(); refreshAllBundleDropdowns(); }
 }
 
@@ -2833,6 +2883,136 @@ function hitungBeliGratis() {
       </div>
     </div>
   `;
+}
+
+// =====================
+// CLOUD SYNC (Google Sheets)
+// =====================
+
+function getSheetsUrl() {
+  return localStorage.getItem('kedaiHeula_sheetsUrl') || '';
+}
+
+function updateSyncStatus() {
+  const url = getSheetsUrl();
+  const lastSync = localStorage.getItem('kedaiHeula_lastSync');
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  if (!url) {
+    el.textContent = 'Belum dikonfigurasi — klik Setup untuk mulai';
+    el.style.color = 'var(--muted)';
+  } else if (lastSync) {
+    el.textContent = '✅ Terakhir sync: ' + lastSync;
+    el.style.color = 'var(--green)';
+  } else {
+    el.textContent = '⚠️ URL tersimpan, belum pernah sync';
+    el.style.color = 'var(--orange)';
+  }
+}
+
+function bukaSyncConfig() {
+  const url = getSheetsUrl();
+  if (url) document.getElementById('sheets-url-input').value = url;
+  document.getElementById('modal-sync').style.display = 'flex';
+}
+
+function tutupSyncConfig() {
+  document.getElementById('modal-sync').style.display = 'none';
+}
+
+async function simpanSyncConfig() {
+  const url = document.getElementById('sheets-url-input').value.trim();
+  if (!url || !url.startsWith('https://script.google.com')) {
+    alert('URL tidak valid. Pastikan URL dimulai dengan https://script.google.com');
+    return;
+  }
+  localStorage.setItem('kedaiHeula_sheetsUrl', url);
+  tutupSyncConfig();
+  showToast('✅ URL tersimpan! Mencoba koneksi...');
+  // Test koneksi
+  await syncKeSheets(true);
+}
+
+async function syncKeSheets(isTest = false) {
+  const url = getSheetsUrl();
+  if (!url) {
+    bukaSyncConfig();
+    return;
+  }
+  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  if (!isTest && data.length === 0) {
+    showToast('⚠️ Tidak ada data untuk di-backup');
+    return;
+  }
+
+  const btnSync = document.getElementById('btn-sync');
+  const origText = btnSync.innerHTML;
+  btnSync.innerHTML = '⏳ Menyimpan...';
+  btnSync.disabled = true;
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'backup', data: data })
+    });
+    const result = await res.json();
+    if (result.status === 'ok') {
+      const now = new Date().toLocaleString('id-ID');
+      localStorage.setItem('kedaiHeula_lastSync', now);
+      updateSyncStatus();
+      showToast(isTest ? '✅ Koneksi berhasil! Data tersimpan.' : `✅ Backup berhasil! ${data.length} menu tersimpan.`);
+    } else {
+      throw new Error(result.message || 'Unknown error');
+    }
+  } catch (e) {
+    showToast('❌ Gagal backup: ' + (e.message || 'Cek koneksi internet'));
+    console.error(e);
+  } finally {
+    btnSync.innerHTML = origText;
+    btnSync.disabled = false;
+  }
+}
+
+async function restoreFromSheets() {
+  const url = getSheetsUrl();
+  if (!url) {
+    bukaSyncConfig();
+    return;
+  }
+  if (!confirm('Restore data dari Google Sheets?\nData lokal yang ada akan digabung dengan data dari cloud (tidak akan dihapus).')) return;
+
+  const btnRestore = document.getElementById('btn-restore');
+  const origText = btnRestore.innerHTML;
+  btnRestore.innerHTML = '⏳ Memuat...';
+  btnRestore.disabled = true;
+
+  try {
+    const res = await fetch(url + '?action=restore', { method: 'GET' });
+    const result = await res.json();
+    if (result.status === 'ok' && Array.isArray(result.data)) {
+      // Merge: gabungkan data cloud dengan lokal, hindari duplikat berdasarkan nama+tanggal
+      const lokal = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+      const cloud = result.data;
+      const merged = [...lokal];
+      cloud.forEach(item => {
+        const exists = merged.some(m => m.nama === item.nama && m.tanggal === item.tanggal);
+        if (!exists) merged.push(item);
+      });
+      localStorage.setItem('kedaiHeula_menu', JSON.stringify(merged));
+      menuList = merged;
+      renderRingkasan();
+      showToast(`✅ Restore berhasil! ${cloud.length} menu dari cloud, total ${merged.length} menu.`);
+    } else {
+      throw new Error(result.message || 'Data tidak ditemukan');
+    }
+  } catch (e) {
+    showToast('❌ Gagal restore: ' + (e.message || 'Cek koneksi internet'));
+    console.error(e);
+  } finally {
+    btnRestore.innerHTML = origText;
+    btnRestore.disabled = false;
+  }
 }
 
 // Init: sudah digabung di window.onload di atas
