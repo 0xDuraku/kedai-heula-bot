@@ -1173,6 +1173,9 @@
             placeholder="https://script.google.com/macros/s/xxx/exec"
             style="width:100%;padding:10px 12px;border-radius:8px;border:2px solid var(--border);font-size:13px;margin-top:6px;outline:none;" />
         </div>
+
+        <!-- Debug Log -->
+        <div id="debug-log" style="display:none;margin-top:12px;padding:10px;background:#1E1E2E;color:#CDD6F4;border-radius:8px;font-family:monospace;font-size:11px;max-height:150px;overflow-y:auto;"></div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="tutupSyncConfig()">Batal</button>
@@ -3151,6 +3154,17 @@ function hitungBeliGratis() {
 // CLOUD SYNC (Google Sheets)
 // =====================
 
+function debugLog(msg, isError = false) {
+  const debugEl = document.getElementById('debug-log');
+  if (debugEl) {
+    debugEl.style.display = 'block';
+    const time = new Date().toLocaleTimeString('id-ID');
+    const color = isError ? '#F38BA8' : '#A6E3A1';
+    debugEl.innerHTML += `<div style="color:${color};margin-bottom:4px;">[${time}] ${msg}</div>`;
+    debugEl.scrollTop = debugEl.scrollHeight;
+  }
+}
+
 function getSheetsUrl() {
   return localStorage.getItem('kedaiHeula_sheetsUrl') || '';
 }
@@ -3175,6 +3189,14 @@ function updateSyncStatus() {
 function bukaSyncConfig() {
   const url = getSheetsUrl();
   if (url) document.getElementById('sheets-url-input').value = url;
+  
+  // Clear debug log
+  const debugEl = document.getElementById('debug-log');
+  if (debugEl) {
+    debugEl.innerHTML = '';
+    debugEl.style.display = 'none';
+  }
+  
   document.getElementById('modal-sync').style.display = 'flex';
 }
 
@@ -3213,23 +3235,54 @@ async function syncKeSheets(isTest = false) {
   btnSync.disabled = true;
 
   try {
+    debugLog('🔄 Mulai backup...');
+    debugLog('📍 URL: ' + url.substring(0, 50) + '...');
+    debugLog('📦 Data: ' + data.length + ' menu');
+    
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'backup', data: data })
+      body: JSON.stringify({ action: 'backup', data: data }),
+      redirect: 'follow'
     });
+    
+    debugLog('📡 Response status: ' + res.status);
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
     const result = await res.json();
+    debugLog('✅ Response: ' + JSON.stringify(result).substring(0, 100));
+    
     if (result.status === 'ok') {
-      const now = getWIBDateTimeString(); // WIB timezone
+      const now = getWIBDateTimeString();
       localStorage.setItem('kedaiHeula_lastSync', now);
       updateSyncStatus();
+      debugLog('✅ Backup berhasil!');
       showToast(isTest ? '✅ Koneksi berhasil! Data tersimpan.' : `✅ Backup berhasil! ${data.length} menu tersimpan.`);
     } else {
       throw new Error(result.message || 'Unknown error');
     }
   } catch (e) {
-    showToast('❌ Gagal backup: ' + (e.message || 'Cek koneksi internet'));
-    console.error(e);
+    debugLog('❌ ERROR: ' + e.message, true);
+    
+    let errorMsg = 'Gagal backup';
+    
+    if (e.message.includes('Failed to fetch')) {
+      errorMsg += ': Cek URL atau deploy ulang Apps Script';
+      debugLog('💡 TIP: Buka Setup → cek URL sudah benar', true);
+    } else if (e.message.includes('HTTP 404')) {
+      errorMsg += ': URL tidak ditemukan';
+      debugLog('💡 TIP: Deploy ulang Apps Script → copy URL baru', true);
+    } else if (e.message.includes('HTTP 403')) {
+      errorMsg += ': Permission ditolak';
+      debugLog('💡 TIP: Set "Who has access" = Anyone di Apps Script', true);
+    } else {
+      errorMsg += ': ' + e.message;
+    }
+    
+    showToast('❌ ' + errorMsg);
   } finally {
     btnSync.innerHTML = origText;
     btnSync.disabled = false;
