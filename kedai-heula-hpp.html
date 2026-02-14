@@ -2980,7 +2980,18 @@ async function restoreFromSheets() {
     bukaSyncConfig();
     return;
   }
-  if (!confirm('Restore data dari Google Sheets?\nData lokal yang ada akan digabung dengan data dari cloud (tidak akan dihapus).')) return;
+  
+  const lokal = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const lokalCount = lokal.length;
+  
+  let confirmMsg = 'Restore data dari Google Sheets?';
+  if (lokalCount > 0) {
+    confirmMsg += `\n\nData lokal: ${lokalCount} menu.\nData akan digabung (tidak dihapus).`;
+  } else {
+    confirmMsg += '\n\nData lokal kosong, akan diisi dari cloud.';
+  }
+  
+  if (!confirm(confirmMsg)) return;
 
   const btnRestore = document.getElementById('btn-restore');
   const origText = btnRestore.innerHTML;
@@ -2988,27 +2999,50 @@ async function restoreFromSheets() {
   btnRestore.disabled = true;
 
   try {
-    const res = await fetch(url + '?action=restore', { method: 'GET' });
+    // CRITICAL: tambahkan ?action=restore ke URL untuk GET request
+    const fetchUrl = url.includes('?') ? url + '&action=restore' : url + '?action=restore';
+    const res = await fetch(fetchUrl, { 
+      method: 'GET',
+      redirect: 'follow'
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
     const result = await res.json();
+    
     if (result.status === 'ok' && Array.isArray(result.data)) {
-      // Merge: gabungkan data cloud dengan lokal, hindari duplikat berdasarkan nama+tanggal
-      const lokal = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
       const cloud = result.data;
+      
+      if (cloud.length === 0) {
+        showToast('⚠️ Tidak ada data di Google Sheets. Backup dulu sebelum restore.');
+        return;
+      }
+      
+      // Merge: gabungkan data cloud dengan lokal, hindari duplikat berdasarkan nama+tanggal
       const merged = [...lokal];
+      let added = 0;
+      
       cloud.forEach(item => {
         const exists = merged.some(m => m.nama === item.nama && m.tanggal === item.tanggal);
-        if (!exists) merged.push(item);
+        if (!exists) {
+          merged.push(item);
+          added++;
+        }
       });
+      
       localStorage.setItem('kedaiHeula_menu', JSON.stringify(merged));
       menuList = merged;
       renderRingkasan();
-      showToast(`✅ Restore berhasil! ${cloud.length} menu dari cloud, total ${merged.length} menu.`);
+      
+      showToast(`✅ Restore berhasil! ${cloud.length} menu dari cloud, ${added} menu baru ditambahkan. Total: ${merged.length} menu.`);
     } else {
-      throw new Error(result.message || 'Data tidak ditemukan');
+      throw new Error(result.message || 'Data tidak valid dari server');
     }
   } catch (e) {
-    showToast('❌ Gagal restore: ' + (e.message || 'Cek koneksi internet'));
-    console.error(e);
+    showToast('❌ Gagal restore: ' + e.message);
+    console.error('Restore error:', e);
   } finally {
     btnRestore.innerHTML = origText;
     btnRestore.disabled = false;
