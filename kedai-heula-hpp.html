@@ -2204,19 +2204,23 @@ function tutupDetail() {
 }
 
 function exportDetailPDF() {
-  const i = parseInt(document.getElementById('modal-detail').dataset.menuIdx);
-  menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
-  const m = menuList[i];
-  if (!m) return;
+  try {
+    const i = parseInt(document.getElementById('modal-detail').dataset.menuIdx);
+    menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+    const m = menuList[i];
+    if (!m) {
+      showToast('❌ Menu tidak ditemukan');
+      return;
+    }
 
-  const totalBahan   = (m.bahanRaw  || []).reduce((s, b) => s + b.biaya, 0);
-  const totalBiaya   = (m.biayaRaw  || []).reduce((s, b) => s + b.biaya, 0);
-  const totalKemasan = (m.kemasan   || 0) * (m.porsi || 1);
-  const totalBatch   = m.totalBatch || (totalBahan + totalBiaya + totalKemasan);
-  const h30 = roundHargaMakanan(m.hpp / (1 - 0.30));
-  const h50 = roundHargaMakanan(m.hpp / (1 - 0.50));
-  const h70 = roundHargaMakanan(m.hpp / (1 - 0.70));
-  const bep = Math.round(m.hpp / (1 - 0.30));
+    const totalBahan   = (m.bahanRaw  || []).reduce((s, b) => s + (b.biaya || 0), 0);
+    const totalBiaya   = (m.biayaRaw  || []).reduce((s, b) => s + (b.biaya || 0), 0);
+    const totalKemasan = (m.kemasan   || 0) * (m.porsi || 1);
+    const totalBatch   = m.totalBatch || (totalBahan + totalBiaya + totalKemasan);
+    const h30 = roundHargaMakanan(m.hpp / (1 - 0.30));
+    const h50 = roundHargaMakanan(m.hpp / (1 - 0.50));
+    const h70 = roundHargaMakanan(m.hpp / (1 - 0.70));
+    const bep = Math.round(m.hpp / (1 - 0.30));
 
   const bahanRows = (m.bahanRaw || []).map(b => `
     <tr>
@@ -2256,7 +2260,7 @@ function exportDetailPDF() {
 
   const tanggalCetak = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
 
-  document.getElementById('print-area').innerHTML = `
+  const printContent = `
     <div class="doc-header">
       <div>
         <div class="brand">🍱 Kedai Heula</div>
@@ -2341,7 +2345,14 @@ function exportDetailPDF() {
     </div>
   `;
 
-  document.getElementById('print-area').innerHTML = printContent;
+  const printArea = document.getElementById('print-area');
+  if (!printArea) {
+    showToast('❌ Error: print-area tidak ditemukan');
+    console.error('print-area element tidak ada');
+    return;
+  }
+  
+  printArea.innerHTML = printContent;
   
   // Deteksi platform
   const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
@@ -2353,6 +2364,11 @@ function exportDetailPDF() {
   } else {
     // Desktop atau mobile browser biasa: print
     window.print();
+  }
+  
+  } catch (error) {
+    console.error('Error di exportDetailPDF:', error);
+    showToast('❌ Error: ' + error.message);
   }
 }
 
@@ -3974,13 +3990,14 @@ async function restoreTransaksiFromSheets() {
 }
 
 function exportLaporanPDF() {
-  const allTransaksi = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
-  const filtered = filterTransaksiByPeriode(allTransaksi);
-  
-  if (filtered.length === 0) {
-    showToast('⚠️ Tidak ada transaksi untuk di-export');
-    return;
-  }
+  try {
+    const allTransaksi = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+    const filtered = filterTransaksiByPeriode(allTransaksi);
+    
+    if (filtered.length === 0) {
+      showToast('⚠️ Tidak ada transaksi untuk di-export');
+      return;
+    }
 
   // Summary data
   const totalProfit = filtered.reduce((s, t) => s + t.profit, 0);
@@ -4152,7 +4169,14 @@ function exportLaporanPDF() {
     </div>
   `;
 
-  document.getElementById('print-area').innerHTML = printContent;
+  const printArea = document.getElementById('print-area');
+  if (!printArea) {
+    showToast('❌ Error: print-area tidak ditemukan');
+    console.error('print-area element tidak ada');
+    return;
+  }
+  
+  printArea.innerHTML = printContent;
   
   const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
   const isMobile = isMobileOrTelegram();
@@ -4161,6 +4185,11 @@ function exportLaporanPDF() {
     showToast('ℹ️ Export PDF: Gunakan Telegram Desktop atau screenshot halaman ini');
   } else {
     window.print();
+  }
+  
+  } catch (error) {
+    console.error('Error di exportLaporanPDF:', error);
+    showToast('❌ Error: ' + error.message);
   }
 }
 
