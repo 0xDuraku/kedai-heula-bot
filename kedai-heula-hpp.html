@@ -6,7 +6,6 @@
 <title>Kalkulator HPP – Kedai Heula</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
     --red: #E03027;
@@ -2342,18 +2341,17 @@ function exportDetailPDF() {
     </div>
   `;
 
-  const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
+  document.getElementById('print-area').innerHTML = printContent;
   
-  if (isMobileOrTelegram() && isTelegram) {
-    // Telegram Mobile: download sebagai gambar PNG
-    const filename = `${m.nama.replace(/[^a-zA-Z0-9]/g, '_')}_Detail_Bahan.png`;
-    downloadAsImage(printContent, filename);
-  } else if (isMobileOrTelegram()) {
-    document.getElementById('print-area').innerHTML = printContent;
-    triggerPrintMobile();
+  // Deteksi platform
+  const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
+  const isMobile = isMobileOrTelegram();
+  
+  if (isMobile && isTelegram) {
+    // Telegram Mobile: kasih tau fitur tidak tersedia
+    showToast('ℹ️ Export PDF: Gunakan Telegram Desktop atau screenshot halaman ini');
   } else {
-    // Desktop: print biasa
-    document.getElementById('print-area').innerHTML = printContent;
+    // Desktop atau mobile browser biasa: print
     window.print();
   }
 }
@@ -2597,65 +2595,6 @@ let currentFotoBase64 = null; // Store foto saat ini
 function isMobileOrTelegram() {
   const ua = navigator.userAgent.toLowerCase();
   return /mobile|android|iphone|ipad|telegram/i.test(ua) || window.innerWidth < 768;
-}
-
-// Download halaman sebagai image PNG
-async function downloadAsImage(htmlContent, filename) {
-  try {
-    showToast('⏳ Membuat gambar...');
-    
-    // Buat temporary container
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.width = '800px'; // Lebar yang cukup untuk konten
-    container.style.padding = '20px';
-    container.style.background = 'white';
-    container.innerHTML = htmlContent;
-    document.body.appendChild(container);
-    
-    // Convert HTML to canvas
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
-    });
-    
-    document.body.removeChild(container);
-    
-    // Convert canvas to blob
-    canvas.toBlob(function(blob) {
-      // Download blob as file
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      showToast('✅ Gambar berhasil diunduh!');
-    }, 'image/png');
-    
-  } catch (err) {
-    console.error('Error membuat gambar:', err);
-    showToast('❌ Gagal: ' + err.message);
-  }
-}
-
-// Trigger print dengan delay untuk mobile
-function triggerPrintMobile() {
-  showToast('📄 Membuka dialog print...');
-  
-  // Delay untuk mobile agar content ter-render dulu
-  setTimeout(() => {
-    try {
-      window.print();
-    } catch (e) {
-      showToast('❌ Print gagal. Coba screenshot halaman ini.');
-      console.error('Print error:', e);
-    }
-  }, 500);
 }
 
 // Preview foto yang diupload
@@ -4213,24 +4152,14 @@ function exportLaporanPDF() {
     </div>
   `;
 
-  const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
+  document.getElementById('print-area').innerHTML = printContent;
   
-  if (isMobileOrTelegram() && isTelegram) {
-    // Telegram Mobile: download sebagai PNG
-    const periodeName = {
-      'hari': 'Hari_Ini',
-      'minggu': '7_Hari',
-      'bulan': 'Bulan_Ini',
-      'semua': 'Semua'
-    }[currentPeriode] || 'Laporan';
-    const filename = `Laporan_Penjualan_${periodeName}.png`;
-    downloadAsImage(printContent, filename);
-  } else if (isMobileOrTelegram()) {
-    document.getElementById('print-area').innerHTML = printContent;
-    triggerPrintMobile();
+  const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
+  const isMobile = isMobileOrTelegram();
+  
+  if (isMobile && isTelegram) {
+    showToast('ℹ️ Export PDF: Gunakan Telegram Desktop atau screenshot halaman ini');
   } else {
-    // Desktop: print biasa
-    document.getElementById('print-area').innerHTML = printContent;
     window.print();
   }
 }
