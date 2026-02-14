@@ -1187,7 +1187,10 @@
         📄 Export PDF
       </button>
       <button class="btn btn-secondary" onclick="syncTransaksiKeSheets()" style="font-size:13px;padding:10px 16px;">
-        ☁️ Backup Transaksi
+        ⬆️ Backup Transaksi
+      </button>
+      <button class="btn btn-secondary" onclick="restoreTransaksiFromSheets()" style="font-size:13px;padding:10px 16px;">
+        ⬇️ Restore Transaksi
       </button>
     </div>
 
@@ -3646,6 +3649,75 @@ function syncTransaksiKeSheets() {
     showToast('❌ Gagal backup transaksi: ' + e.message);
     console.error(e);
   });
+}
+
+async function restoreTransaksiFromSheets() {
+  const url = getSheetsUrl();
+  if (!url) {
+    alert('Setup Google Sheets dulu di tab Ringkasan Menu → Setup Cloud Backup');
+    return;
+  }
+
+  const lokal = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
+  const lokalCount = lokal.length;
+  
+  let confirmMsg = 'Restore transaksi dari Google Sheets?';
+  if (lokalCount > 0) {
+    confirmMsg += `\n\nData lokal: ${lokalCount} transaksi.\nData akan digabung (tidak dihapus).`;
+  } else {
+    confirmMsg += '\n\nData lokal kosong, akan diisi dari cloud.';
+  }
+  
+  if (!confirm(confirmMsg)) return;
+
+  showToast('⏳ Memuat transaksi dari cloud...');
+
+  try {
+    const fetchUrl = url.includes('?') ? url + '&action=restore_transaksi' : url + '?action=restore_transaksi';
+    const res = await fetch(fetchUrl, { 
+      method: 'GET',
+      redirect: 'follow'
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
+    const result = await res.json();
+    
+    if (result.status === 'ok' && Array.isArray(result.data)) {
+      const cloud = result.data;
+      
+      if (cloud.length === 0) {
+        showToast('⚠️ Tidak ada transaksi di Google Sheets. Backup dulu sebelum restore.');
+        return;
+      }
+      
+      // Merge: gabungkan data cloud dengan lokal, hindari duplikat berdasarkan id
+      const merged = [...lokal];
+      let added = 0;
+      
+      cloud.forEach(item => {
+        const exists = merged.some(t => t.id === item.id);
+        if (!exists) {
+          merged.push(item);
+          added++;
+        }
+      });
+      
+      localStorage.setItem('kedaiHeula_transaksi', JSON.stringify(merged));
+      
+      showToast(`✅ Restore berhasil! ${cloud.length} transaksi dari cloud, ${added} transaksi baru ditambahkan. Total: ${merged.length} transaksi.`);
+      
+      // Re-render laporan
+      renderLaporan();
+    } else {
+      throw new Error(result.message || 'Data tidak valid dari server');
+    }
+  } catch (e) {
+    showToast('❌ Gagal restore: ' + e.message);
+    console.error('Restore error:', e);
+  }
 }
 
 function exportLaporanPDF() {
