@@ -6,6 +6,8 @@
 <title>Kalkulator HPP – Kedai Heula</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
     --red: #E03027;
@@ -2378,7 +2380,15 @@ function exportDetailPDF() {
     </div>
   `;
 
-  window.print();
+  // Mobile: download PDF langsung, Desktop: window.print
+  if (isMobileOrTelegram()) {
+    const printArea = document.getElementById('print-area');
+    printArea.innerHTML = printContent;
+    downloadPDF(`${m.nama.replace(/[^a-zA-Z0-9]/g, '_')}_Detail_Bahan.pdf`, printArea.innerHTML);
+  } else {
+    document.getElementById('print-area').innerHTML = printContent;
+    window.print();
+  }
 }
 
 // =====================
@@ -2615,6 +2625,54 @@ function tutupEdit() {
 // =====================
 
 let currentFotoBase64 = null; // Store foto saat ini
+
+// Deteksi apakah di mobile/Telegram
+function isMobileOrTelegram() {
+  const ua = navigator.userAgent.toLowerCase();
+  return /mobile|android|iphone|ipad|telegram/i.test(ua) || window.innerWidth < 768;
+}
+
+// Download PDF dari HTML content (untuk mobile)
+async function downloadPDF(filename, htmlContent) {
+  try {
+    showToast('⏳ Membuat PDF...');
+    
+    // Buat temporary container
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.width = '210mm'; // A4 width
+    container.style.padding = '15mm';
+    container.style.background = 'white';
+    container.innerHTML = htmlContent;
+    document.body.appendChild(container);
+    
+    // Convert HTML to canvas
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false
+    });
+    
+    document.body.removeChild(container);
+    
+    // Convert canvas to PDF
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    
+    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+    pdf.save(filename);
+    
+    showToast('✅ PDF berhasil diunduh!');
+  } catch (err) {
+    console.error('Error membuat PDF:', err);
+    showToast('❌ Gagal membuat PDF: ' + err.message);
+  }
+}
 
 // Preview foto yang diupload
 function previewFoto(input, previewId) {
@@ -4171,8 +4229,21 @@ function exportLaporanPDF() {
     </div>
   `;
 
-  document.getElementById('print-area').innerHTML = printContent;
-  window.print();
+  // Mobile: download PDF langsung, Desktop: window.print
+  if (isMobileOrTelegram()) {
+    const printArea = document.getElementById('print-area');
+    printArea.innerHTML = printContent;
+    const periodeName = {
+      'hari': 'Hari_Ini',
+      'minggu': '7_Hari',
+      'bulan': 'Bulan_Ini',
+      'semua': 'Semua'
+    }[currentPeriode] || 'Laporan';
+    downloadPDF(`Laporan_Penjualan_${periodeName}.pdf`, printArea.innerHTML);
+  } else {
+    document.getElementById('print-area').innerHTML = printContent;
+    window.print();
+  }
 }
 
 // Init: sudah digabung di window.onload di atas
