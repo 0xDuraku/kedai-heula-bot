@@ -2341,30 +2341,51 @@ function exportDetailPDF() {
     </div>
   `;
 
-  document.getElementById('print-area').innerHTML = printContent;
-  
-  // Mobile Telegram: buka di browser external langsung
+  // Tampilkan print area sebagai fullscreen overlay untuk screenshot
   const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
   
   if (isMobileOrTelegram() && isTelegram) {
-    // Coba buka di browser external
-    const currentUrl = window.location.href;
-    const printUrl = currentUrl.split('?')[0] + '?print=detail&menu=' + encodeURIComponent(m.nama);
+    // Telegram Mobile: tampilkan overlay untuk screenshot
+    const printArea = document.getElementById('print-area');
+    printArea.innerHTML = printContent;
+    printArea.style.display = 'block';
+    printArea.style.position = 'fixed';
+    printArea.style.top = '0';
+    printArea.style.left = '0';
+    printArea.style.width = '100%';
+    printArea.style.height = '100%';
+    printArea.style.background = 'white';
+    printArea.style.zIndex = '99999';
+    printArea.style.overflow = 'auto';
+    printArea.style.padding = '20px';
     
-    if (confirm(`📱 Export PDF tidak tersedia di Telegram Mobile.
-
-Pilih OK untuk buka halaman ini di browser, atau Cancel untuk screenshot saja.`)) {
-      // Telegram WebApp API untuk buka browser
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.openLink(printUrl);
-      } else {
-        // Fallback: buka dengan window.open
-        window.open(printUrl, '_blank');
-      }
-    }
+    // Tambah tombol close
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕ Tutup';
+    closeBtn.style.position = 'fixed';
+    closeBtn.style.top = '10px';
+    closeBtn.style.right = '10px';
+    closeBtn.style.padding = '10px 20px';
+    closeBtn.style.background = '#E03027';
+    closeBtn.style.color = 'white';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '8px';
+    closeBtn.style.fontWeight = 'bold';
+    closeBtn.style.fontSize = '14px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.zIndex = '100000';
+    closeBtn.onclick = function() {
+      printArea.style.display = 'none';
+    };
+    printArea.appendChild(closeBtn);
+    
+    // Toast instruksi
+    showToast('📸 Screenshot halaman ini untuk simpan PDF!');
   } else if (isMobileOrTelegram()) {
+    document.getElementById('print-area').innerHTML = printContent;
     triggerPrintMobile();
   } else {
+    document.getElementById('print-area').innerHTML = printContent;
     window.print();
   }
 }
@@ -4180,27 +4201,49 @@ function exportLaporanPDF() {
     </div>
   `;
 
-  document.getElementById('print-area').innerHTML = printContent;
-  
-  // Mobile Telegram: buka di browser external
+  // Tampilkan print area untuk screenshot
   const isTelegram = /telegram/i.test(navigator.userAgent.toLowerCase());
   
   if (isMobileOrTelegram() && isTelegram) {
-    const currentUrl = window.location.href;
-    const printUrl = currentUrl.split('?')[0] + '?print=laporan';
+    // Telegram Mobile: fullscreen overlay
+    const printArea = document.getElementById('print-area');
+    printArea.innerHTML = printContent;
+    printArea.style.display = 'block';
+    printArea.style.position = 'fixed';
+    printArea.style.top = '0';
+    printArea.style.left = '0';
+    printArea.style.width = '100%';
+    printArea.style.height = '100%';
+    printArea.style.background = 'white';
+    printArea.style.zIndex = '99999';
+    printArea.style.overflow = 'auto';
+    printArea.style.padding = '20px';
     
-    if (confirm(`📱 Export PDF tidak tersedia di Telegram Mobile.
-
-Pilih OK untuk buka halaman ini di browser, atau Cancel untuk screenshot saja.`)) {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.openLink(printUrl);
-      } else {
-        window.open(printUrl, '_blank');
-      }
-    }
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕ Tutup';
+    closeBtn.style.position = 'fixed';
+    closeBtn.style.top = '10px';
+    closeBtn.style.right = '10px';
+    closeBtn.style.padding = '10px 20px';
+    closeBtn.style.background = '#E03027';
+    closeBtn.style.color = 'white';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '8px';
+    closeBtn.style.fontWeight = 'bold';
+    closeBtn.style.fontSize = '14px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.zIndex = '100000';
+    closeBtn.onclick = function() {
+      printArea.style.display = 'none';
+    };
+    printArea.appendChild(closeBtn);
+    
+    showToast('📸 Screenshot halaman ini untuk simpan PDF!');
   } else if (isMobileOrTelegram()) {
+    document.getElementById('print-area').innerHTML = printContent;
     triggerPrintMobile();
   } else {
+    document.getElementById('print-area').innerHTML = printContent;
     window.print();
   }
 }
