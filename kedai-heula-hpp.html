@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator HPP – Kedai Heula</title>
+<meta name="description" content="Kedai Heula - Aplikasi manajemen bisnis kuliner lengkap: hitung HPP, kelola menu, analisa penjualan, dan strategi promo">
+<title>Kedai Heula – Jajanan Mantap Pisani</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -12,10 +13,10 @@
     --orange: #F47C20;
     --yellow: #F5C518;
     --dark: #1A1A1A;
-    --bg: #FFF8F0;
-    --card: #FFFFFF;
+    --bg: #FFF4E6;
+    --card: #FFFAF5;
     --muted: #888;
-    --border: #F0E0CC;
+    --border: #FFE4CC;
     --green: #27AE60;
     --light-red: #FFF0EF;
   }
@@ -72,40 +73,60 @@
 
   /* TABS */
   .tabs-wrapper {
-    background: white;
-    border-bottom: 2px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
+    background: var(--card);
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  
+  /* Mobile portrait - responsive */
+  @media (max-width: 480px) {
+    .tab-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
   }
 
-  .tab-btn {
-    padding: 14px 22px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--muted);
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    transition: all 0.2s;
-    white-space: nowrap;
+  .tab-icon {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 12px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
   }
-
-  .tab-btn:hover { color: var(--orange); }
-
-  .tab-btn.active {
-    color: var(--red);
-    border-bottom-color: var(--red);
+  .tab-icon:hover {
+    border-color: var(--orange);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
-
-  .tab-emoji { font-size: 16px; }
+  .tab-icon.active {
+    background: linear-gradient(135deg, #FFF8F0, #FFE4CC);
+    border-color: var(--orange);
+    box-shadow: 0 2px 8px rgba(244,124,32,0.2);
+  }
+  .ti-icon {
+    font-size: 32px;
+    line-height: 1;
+  }
+  .ti-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dark);
+    text-align: center;
+    line-height: 1.3;
+  }
 
   /* MAIN */
   .main { padding: 24px; max-width: 960px; margin: 0 auto; }
@@ -180,7 +201,7 @@
 
   input:focus, select:focus {
     border-color: var(--orange);
-    background: white;
+    background: var(--card);
   }
 
   .form-row {
@@ -240,7 +261,7 @@
   .btn-danger:hover { background: #FFE0DF; }
 
   .btn-add {
-    background: white;
+    background: var(--card);
     color: var(--orange);
     border: 2px dashed var(--orange);
     width: 100%;
@@ -408,7 +429,7 @@
   }
 
   .price-option {
-    background: white;
+    background: var(--card);
     border-radius: 10px;
     padding: 12px;
     text-align: center;
@@ -446,7 +467,7 @@
 
   /* SUMMARY TAB */
   .menu-card {
-    background: white;
+    background: var(--card);
     border-radius: 14px;
     border: 2px solid var(--border);
     padding: 16px;
@@ -593,7 +614,7 @@
   }
 
   .promo-type-btn {
-    background: white;
+    background: var(--card);
     border: 2px solid var(--border);
     border-radius: 14px;
     padding: 14px 10px;
@@ -772,7 +793,7 @@
   }
 
   .modal-box {
-    background: white;
+    background: var(--card);
     border-radius: 20px;
     width: 100%;
     max-width: 680px;
@@ -790,7 +811,7 @@
   .modal-header {
     position: sticky;
     top: 0;
-    background: white;
+    background: var(--card);
     padding: 18px 20px 14px;
     border-bottom: 2px solid var(--border);
     display: flex;
@@ -825,7 +846,7 @@
   .modal-footer {
     position: sticky;
     bottom: 0;
-    background: white;
+    background: var(--card);
     padding: 14px 20px;
     border-top: 2px solid var(--border);
     display: flex;
@@ -914,27 +935,34 @@
 <header>
   <div>
     <div class="logo-text">🍱 Kedai Heula</div>
-    <div class="logo-sub">Kalkulator HPP – Jajanan Mantap Pisan!</div>
+    <div class="logo-sub">Manajemen Bisnis Kuliner – Jajanan Mantap Pisan!</div>
   </div>
-  <div class="badge">HPP Calculator</div>
+  <div class="badge">BETA</div>
 </header>
 
 <div class="tabs-wrapper">
-  <button class="tab-btn active" onclick="switchTab('hitung')">
-    <span class="tab-emoji">🧮</span> <span>Hitung HPP</span>
-  </button>
-  <button class="tab-btn" onclick="switchTab('ringkasan')">
-    <span class="tab-emoji">📋</span> <span>Ringkasan Menu</span>
-  </button>
-  <button class="tab-btn" onclick="switchTab('laporan')">
-    <span class="tab-emoji">📊</span> <span>Laporan</span>
-  </button>
-  <button class="tab-btn" onclick="switchTab('promo')">
-    <span class="tab-emoji">🏷️</span> <span>Kalkulator Promo</span>
-  </button>
-  <button class="tab-btn" onclick="switchTab('panduan')">
-    <span class="tab-emoji">📖</span> <span>Panduan</span>
-  </button>
+  <div class="tab-grid">
+    <button class="tab-icon active" onclick="switchTab('hitung')">
+      <div class="ti-icon">🧮</div>
+      <div class="ti-label">Hitung HPP</div>
+    </button>
+    <button class="tab-icon" onclick="switchTab('ringkasan')">
+      <div class="ti-icon">📋</div>
+      <div class="ti-label">Ringkasan Menu</div>
+    </button>
+    <button class="tab-icon" onclick="switchTab('laporan')">
+      <div class="ti-icon">📊</div>
+      <div class="ti-label">Laporan</div>
+    </button>
+    <button class="tab-icon" onclick="switchTab('promo')">
+      <div class="ti-icon">🏷️</div>
+      <div class="ti-label">Promo</div>
+    </button>
+    <button class="tab-icon" onclick="switchTab('panduan')">
+      <div class="ti-icon">📖</div>
+      <div class="ti-label">Panduan</div>
+    </button>
+  </div>
 </div>
 
 <div class="main">
@@ -945,7 +973,7 @@
     <div class="info-box">
       <span class="info-icon">💡</span>
       <div>
-        <strong>Cara pakai:</strong> Isi info produk → tambah bahan-bahan → tambah biaya operasional → klik <strong>Hitung HPP</strong>. Hasilnya langsung muncul di bawah beserta saran harga jual!
+        <strong>Cara pakai:</strong> Isi info produk → tambah bahan-bahan → tambah biaya operasional → klik <strong>Hitung HPP</strong>. Hasilnya langsung tersimpan dan bisa diakses di tab <strong>Ringkasan Menu</strong>, <strong>Laporan Penjualan</strong>, dan <strong>Kalkulator Promo</strong>!
       </div>
     </div>
 
@@ -1156,7 +1184,7 @@
     <div class="section-sub">Semua menu yang sudah dihitung HPP-nya ada di sini.</div>
 
     <!-- CLOUD SYNC BAR -->
-    <div id="sync-bar" style="background:white;border:2px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div id="sync-bar" style="background:#FFFAF5;border:2px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div style="flex:1;min-width:160px;">
         <div style="font-size:13px;font-weight:800;color:var(--dark);">☁️ Cloud Backup (Google Sheets)</div>
         <div id="sync-status" style="font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;">Belum dikonfigurasi</div>
@@ -1359,6 +1387,11 @@
         <div class="pt-label">Beli X Gratis Y</div>
         <div class="pt-desc">Gratis item/cashback</div>
       </div>
+      <div class="promo-type-btn" onclick="switchPromo('poster', this)">
+        <div class="pt-icon">🎨</div>
+        <div class="pt-label">Generate Poster</div>
+        <div class="pt-desc">Poster Instagram siap pakai</div>
+      </div>
     </div>
 
     <!-- PANEL: DISKON % -->
@@ -1467,6 +1500,18 @@
       <div class="card">
         <div class="card-title" style="margin-bottom:16px;">🎁 Simulasi Beli X Gratis Y</div>
 
+        <div class="info-box" style="margin-bottom:16px;">
+          <span class="info-icon">ℹ️</span>
+          <div>Pilih menu dari <strong>Ringkasan Menu</strong> untuk auto-fill HPP dan harga jual.</div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>Pilih Menu (opsional)</label>
+          <select id="bg-menu-select" onchange="isiBeliGratis()" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:700;width:100%;">
+            <option value="">🔍 Pilih dari Ringkasan Menu...</option>
+          </select>
+        </div>
+
         <div class="beli-dapat-grid">
           <div class="form-group">
             <label>Beli (pcs)</label>
@@ -1479,6 +1524,14 @@
           </div>
         </div>
 
+        <div class="form-group" style="margin-bottom:16px;">
+          <label style="font-weight:700;margin-bottom:8px;display:block;">Channel Penjualan</label>
+          <select id="bg-channel" onchange="toggleBeliGratisChannel()" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:700;width:100%;background:var(--card);">
+            <option value="offline">🏪 Offline (tanpa platform fee)</option>
+            <option value="online">📱 Online (GoFood/Shopee/Grab)</option>
+          </select>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label>HPP per Pcs (Rp)</label>
@@ -1489,7 +1542,7 @@
             <input type="number" id="bg-harga" placeholder="12000" min="0" oninput="hitungBeliGratis()" />
           </div>
         </div>
-        <div class="form-row">
+        <div class="form-row" id="bg-fee-row" style="display:grid;">
           <div class="form-group">
             <label>Platform Fee (%) — GoFood/Shopee</label>
             <input type="number" id="bg-fee" value="20" min="0" max="100" oninput="hitungBeliGratis()" />
@@ -1504,6 +1557,46 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- PANEL: GENERATE POSTER -->
+  <div id="panel-poster" class="promo-panel">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;">🎨 Generate Poster Instagram</div>
+      
+      <div class="info-box" style="margin-bottom:16px;">
+        <span class="info-icon">✨</span>
+        <div>Buat poster promo siap pakai untuk Instagram/Facebook dengan logo Kedai Heula. Pilih jenis promo, isi detail, lalu download!</div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-weight:700;">Jenis Promo</label>
+        <select id="poster-type" onchange="updatePosterPreview()" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:700;width:100%;background:var(--card);">
+          <option value="diskon">✂️ Diskon Persen</option>
+          <option value="bundling">📦 Paket Bundling</option>
+          <option value="beli-gratis">🎁 Beli X Gratis Y</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-weight:700;">Judul Promo</label>
+        <input type="text" id="poster-title" placeholder="cth: DISKON 30% SEMUA MENU!" oninput="updatePosterPreview()" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:700;width:100%;background:var(--card);" />
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-weight:700;">Detail Promo</label>
+        <textarea id="poster-detail" placeholder="cth: Berlaku untuk semua jenis Takoyaki & Dimsum&#10;Periode: 15-28 Feb 2026&#10;Pembelian min. Rp 50.000" oninput="updatePosterPreview()" rows="4" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:600;width:100%;background:var(--card);resize:vertical;"></textarea>
+      </div>
+
+      <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px;">
+        <div style="font-weight:700;margin-bottom:12px;font-size:14px;">📱 Preview Poster (1080x1080px)</div>
+        <canvas id="poster-canvas" width="1080" height="1080" style="width:100%;max-width:400px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);"></canvas>
+      </div>
+
+      <button class="btn btn-primary" onclick="downloadPoster()" style="width:100%;padding:14px;font-size:15px;">
+        📥 Download Poster PNG
+      </button>
+    </div>
   </div>
 
   <!-- TAB PANDUAN -->
@@ -1785,13 +1878,18 @@ window.onload = () => {
 // =====================
 function switchTab(id) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-icon').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   event.currentTarget.classList.add('active');
   if (id === 'ringkasan') { renderRingkasan(); updateSyncStatus(); }
   if (id === 'laporan') initLaporan();
-  if (id === 'promo') { refreshDropdownDiskon(); refreshAllBundleDropdowns(); }
+  if (id === 'promo') { 
+    refreshDropdownDiskon(); 
+    refreshAllBundleDropdowns();
+    refreshDropdownBeliGratis();
+  }
 }
+
 
 // =====================
 // BAHAN
@@ -2392,7 +2490,7 @@ function exportDetailPDF() {
     </div>
 
     <div class="doc-footer">
-      <span>Kedai Heula – Kalkulator HPP</span>
+      <span>Kedai Heula – Manajemen Bisnis Kuliner</span>
       <span>Dicetak: ${tanggalCetak}</span>
     </div>
   `;
@@ -2651,6 +2749,77 @@ function tutupEdit() {
 }
 
 // =====================
+// GENERATE POSTER INSTAGRAM
+// =====================
+function updatePosterPreview() {
+  const canvas = document.getElementById('poster-canvas');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const w = 1080;
+  const h = 1080;
+  
+  const type = document.getElementById('poster-type')?.value || 'diskon';
+  const title = document.getElementById('poster-title')?.value || 'PROMO SPESIAL!';
+  const detail = document.getElementById('poster-detail')?.value || 'Periode terbatas';
+  
+  // Background gradient orange
+  const gradient = ctx.createLinearGradient(0, 0, 0, h);
+  gradient.addColorStop(0, '#FF8C42');
+  gradient.addColorStop(0.5, '#F47C20');
+  gradient.addColorStop(1, '#E03027');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, w, h);
+  
+  // White card
+  ctx.fillStyle = '#FFFAF5';
+  ctx.beginPath();
+  ctx.roundRect(80, 200, 920, 680, 40);
+  ctx.fill();
+  
+  // Title
+  ctx.fillStyle = '#E03027';
+  ctx.font = 'bold 72px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(title.toUpperCase(), w/2, 400);
+  
+  // Detail
+  ctx.fillStyle = '#1A1A1A';
+  ctx.font = '500 42px Arial';
+  const lines = detail.split('\n');
+  let y = 520;
+  lines.forEach(line => {
+    ctx.fillText(line, w/2, y);
+    y += 60;
+  });
+  
+  // Footer
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 36px Arial';
+  ctx.fillText('Kedai Heula - Jajanan Mantap Pisan!', w/2, h - 100);
+  
+  // Logo circle
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.arc(w/2, 120, 80, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#F47C20';
+  ctx.font = 'bold 64px Arial';
+  ctx.fillText('🍱', w/2, 145);
+}
+
+function downloadPoster() {
+  const canvas = document.getElementById('poster-canvas');
+  if (!canvas) return;
+  
+  const link = document.createElement('a');
+  link.download = `kedai-heula-poster-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('✅ Poster berhasil didownload!');
+}
+
+// =====================
 // HELPERS
 // =====================
 // =====================
@@ -2835,12 +3004,17 @@ function getCategoryLabel(cat) {
   return map[cat] || cat;
 }
 
+function getCategoryEmoji(cat) {
+  const map = { takoyaki: '🐙', dimsum: '🥟', ayam: '🍗', lainnya: '🍱' };
+  return map[cat] || '🍽️';
+}
+
 function pilihHarga(el, type) {
   // Reset semua border di row yang sama
   const parent = el.parentElement;
   parent.querySelectorAll('.price-option').forEach(p => {
     p.style.borderColor = '#D1FAE5';
-    p.style.background = 'white';
+    p.style.background = '#FFFAF5';
   });
   
   // Highlight yang diklik
@@ -3186,11 +3360,11 @@ function hitungBundling() {
         <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
           🟡 HEMAT<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~10%</span>
         </div>
-        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
           <div style="font-weight:800;color:#E65100;font-size:16px;">${formatRp(offlineHemat)}</div>
           <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflineHemat)}</div>
         </div>
-        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
           <div style="font-weight:800;color:#E65100;font-size:16px;">${formatRp(onlineHemat)}</div>
           <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlineHemat)}</div>
         </div>
@@ -3216,11 +3390,11 @@ function hitungBundling() {
         <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
           🔥 PREMIUM<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~35%</span>
         </div>
-        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
           <div style="font-weight:800;color:#1976D2;font-size:16px;">${formatRp(offlinePremium)}</div>
           <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflinePremium)}</div>
         </div>
-        <div style="background:white;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
+        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
           <div style="font-weight:800;color:#1976D2;font-size:16px;">${formatRp(onlinePremium)}</div>
           <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlinePremium)}</div>
         </div>
@@ -3358,6 +3532,53 @@ function hitungBeliGratis() {
 // =====================
 // PROMO - BELI X GRATIS Y
 // =====================
+function refreshDropdownBeliGratis() {
+  const sel = document.getElementById('bg-menu-select');
+  if (!sel) return;
+  
+  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  let opts = '<option value="">🔍 Pilih dari Ringkasan Menu...</option>';
+  
+  data.forEach((m, i) => {
+    opts += `<option value="${i}">${getCategoryEmoji(m.kategori)} ${m.nama} — HPP: ${formatRp(m.hpp)} | Jual: ${formatRp(m.hargaJual)}</option>`;
+  });
+  
+  if (data.length === 0) opts += '<option value="" disabled>⚠️ Belum ada menu tersimpan</option>';
+  sel.innerHTML = opts;
+}
+
+function isiBeliGratis() {
+  const sel = document.getElementById('bg-menu-select');
+  const idx = sel.value;
+  if (idx === '') return;
+  
+  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const menu = data[parseInt(idx)];
+  if (!menu) return;
+  
+  document.getElementById('bg-hpp').value = Math.round(menu.hpp);
+  document.getElementById('bg-harga').value = Math.round(menu.hargaJual);
+  hitungBeliGratis();
+  showToast(`✅ ${menu.nama} dipilih`);
+}
+
+function toggleBeliGratisChannel() {
+  const channel = document.getElementById('bg-channel').value;
+  const feeRow = document.getElementById('bg-fee-row');
+  
+  if (channel === 'offline') {
+    // Offline - hide platform fee
+    if (feeRow) feeRow.style.display = 'none';
+    document.getElementById('bg-fee').value = 0;
+  } else {
+    // Online - show platform fee
+    if (feeRow) feeRow.style.display = 'grid';
+    document.getElementById('bg-fee').value = 20;
+  }
+  
+  hitungBeliGratis();
+}
+
 function hitungBeliGratis() {
   const beli = parseFloat(document.getElementById('bg-beli').value) || 1;
   const gratis = parseFloat(document.getElementById('bg-gratis').value) || 1;
