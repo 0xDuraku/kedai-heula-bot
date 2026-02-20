@@ -933,9 +933,12 @@
 <body>
 
 <header>
-  <div>
-    <div class="logo-text">🍱 Kedai Heula</div>
-    <div class="logo-sub">Manajemen Bisnis Kuliner – Jajanan Mantap Pisan!</div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--orange));display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 2px 8px rgba(224,48,39,0.3);">🍱</div>
+    <div>
+      <div class="logo-text">Kedai Heula</div>
+      <div class="logo-sub">Manajemen Bisnis Kuliner – Jajanan Mantap Pisan!</div>
+    </div>
   </div>
   <div class="badge">BETA</div>
 </header>
@@ -957,6 +960,10 @@
     <button class="tab-icon" onclick="switchTab('promo')">
       <div class="ti-icon">🏷️</div>
       <div class="ti-label">Promo</div>
+    </button>
+    <button class="tab-icon" onclick="switchTab('pos')">
+      <div class="ti-icon">💰</div>
+      <div class="ti-label">Kasir (POS)</div>
     </button>
     <button class="tab-icon" onclick="switchTab('panduan')">
       <div class="ti-icon">📖</div>
@@ -1112,56 +1119,64 @@
       <!-- SARAN HARGA JUAL -->
       <div class="price-suggestion">
         <h4>💡 Rekomendasi Harga Jual</h4>
-        
-        <!-- Header kolom -->
-        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px;font-weight:700;color:#666;">
-          <div></div>
-          <div style="text-align:center;">🏪 OFFLINE</div>
-          <div style="text-align:center;">📱 ONLINE<br><span style="font-size:9px;font-weight:400;">(GoFood/Shopee)</span></div>
-        </div>
 
-        <!-- Row 1: Ekonomis -->
-        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
-            🟡 EKONOMIS<br><span style="font-size:10px;font-weight:400;color:#999;">Margin 30%</span>
-          </div>
-          <div class="price-option" onclick="pilihHarga(this, 'offline')" data-margin="30" style="margin:0;">
-            <div class="po-value" id="harga-30-offline">Rp 0</div>
-          </div>
-          <div class="price-option" onclick="pilihHarga(this, 'online')" data-margin="30" style="margin:0;">
-            <div class="po-value" id="harga-30-online">Rp 0</div>
-          </div>
-        </div>
-
-        <!-- Row 2: Standar (recommended) -->
-        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
-            🟢 STANDAR<br><span style="font-size:10px;font-weight:400;color:#999;">Margin 50%</span>
-          </div>
-          <div class="price-option recommended" onclick="pilihHarga(this, 'offline')" data-margin="50" style="margin:0;border:2px solid #4CAF50;">
-            <div class="po-value" id="harga-50-offline">Rp 0</div>
-          </div>
-          <div class="price-option recommended" onclick="pilihHarga(this, 'online')" data-margin="50" style="margin:0;border:2px solid #4CAF50;">
-            <div class="po-value" id="harga-50-online">Rp 0</div>
+        <!-- Step 1: Pilih Kategori -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Pilih Kategori Harga:</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            <div id="btn-kategori-30" onclick="pilihKategoriHarga(30)" style="background:#FFF9E6;border:2px solid #F5C518;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.2s;">
+              <div style="font-size:20px;margin-bottom:4px;">🟡</div>
+              <div style="font-size:12px;font-weight:800;color:#B8860B;">EKONOMIS</div>
+              <div style="font-size:10px;color:#999;margin-top:2px;">Margin 30%</div>
+            </div>
+            <div id="btn-kategori-50" onclick="pilihKategoriHarga(50)" style="background:#E8F5E9;border:2px solid #27AE60;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(39,174,96,0.2);">
+              <div style="font-size:20px;margin-bottom:4px;">🟢</div>
+              <div style="font-size:12px;font-weight:800;color:#1B5E20;">STANDAR ⭐</div>
+              <div style="font-size:10px;color:#999;margin-top:2px;">Margin 50%</div>
+            </div>
+            <div id="btn-kategori-70" onclick="pilihKategoriHarga(70)" style="background:#FFF0EF;border:2px solid #E03027;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.2s;">
+              <div style="font-size:20px;margin-bottom:4px;">🔥</div>
+              <div style="font-size:12px;font-weight:800;color:#E03027;">PREMIUM</div>
+              <div style="font-size:10px;color:#999;margin-top:2px;">Margin 70%</div>
+            </div>
           </div>
         </div>
 
-        <!-- Row 3: Premium -->
-        <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;">
-          <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
-            🔥 PREMIUM<br><span style="font-size:10px;font-weight:400;color:#999;">Margin 70%</span>
+        <!-- Step 2: Pilih Channel (muncul setelah pilih kategori) -->
+        <div id="channel-selector" style="display:none;">
+          <div style="font-size:11px;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Pilih Channel Penjualan:</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div id="btn-channel-offline" onclick="pilihChannelHarga('offline')" style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;">
+              <div style="font-size:22px;margin-bottom:4px;">🏪</div>
+              <div style="font-size:13px;font-weight:800;">OFFLINE</div>
+              <div style="font-size:10px;color:#999;margin-top:2px;">Tanpa platform fee</div>
+            </div>
+            <div id="btn-channel-online" onclick="pilihChannelHarga('online')" style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;">
+              <div style="font-size:22px;margin-bottom:4px;">📱</div>
+              <div style="font-size:13px;font-weight:800;">ONLINE</div>
+              <div style="font-size:10px;color:#999;margin-top:2px;">GoFood / Shopee</div>
+            </div>
           </div>
-          <div class="price-option" onclick="pilihHarga(this, 'offline')" data-margin="70" style="margin:0;">
-            <div class="po-value" id="harga-70-offline">Rp 0</div>
+
+          <!-- Hasil Harga Terpilih -->
+          <div id="harga-terpilih-display" style="display:none;background:linear-gradient(135deg,var(--green),#2ECC71);border-radius:14px;padding:16px;text-align:center;color:white;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:800;opacity:0.85;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;" id="harga-terpilih-label">Harga Jual</div>
+            <div style="font-family:'Fredoka One',cursive;font-size:36px;line-height:1;" id="harga-terpilih-nilai">Rp 0</div>
+            <div style="font-size:11px;opacity:0.8;margin-top:4px;" id="harga-terpilih-info">profit per pcs</div>
           </div>
-          <div class="price-option" onclick="pilihHarga(this, 'online')" data-margin="70" style="margin:0;">
-            <div class="po-value" id="harga-70-online">Rp 0</div>
+
+          <div style="font-size:11px;color:#666;margin-top:6px;">
+            ℹ️ <strong>Harga online 25% lebih tinggi</strong> untuk cover platform fee ~20%.
           </div>
         </div>
 
-        <div style="font-size:11px;color:#666;margin-top:10px;padding-top:10px;border-top:1px solid #ddd;">
-          ℹ️ <strong>Harga online 25% lebih tinggi</strong> untuk cover platform fee ~20%.
-        </div>
+        <!-- Hidden inputs to track selection (used by hitungHPP) -->
+        <input type="hidden" id="harga-30-offline" value="0" />
+        <input type="hidden" id="harga-30-online" value="0" />
+        <input type="hidden" id="harga-50-offline" value="0" />
+        <input type="hidden" id="harga-50-online" value="0" />
+        <input type="hidden" id="harga-70-offline" value="0" />
+        <input type="hidden" id="harga-70-online" value="0" />
       </div>
 
       <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
@@ -1387,10 +1402,10 @@
         <div class="pt-label">Beli X Gratis Y</div>
         <div class="pt-desc">Gratis item/cashback</div>
       </div>
-      <div class="promo-type-btn" onclick="switchPromo('poster', this)">
-        <div class="pt-icon">🎨</div>
-        <div class="pt-label">Generate Poster</div>
-        <div class="pt-desc">Poster Instagram siap pakai</div>
+      <div class="promo-type-btn" onclick="switchPromo('aktif', this)">
+        <div class="pt-icon">📋</div>
+        <div class="pt-label">Promo Aktif</div>
+        <div class="pt-desc">Kelola promo tersimpan</div>
       </div>
     </div>
 
@@ -1468,6 +1483,36 @@
         </div>
 
         <div id="diskon-result" style="display:none;"></div>
+        
+        <!-- Form Simpan Promo -->
+        <div id="form-simpan-diskon" style="display:none;margin-top:20px;background:var(--bg);padding:16px;border-radius:12px;border:2px dashed var(--orange);">
+          <div style="font-weight:800;margin-bottom:12px;font-size:14px;">💾 Simpan Promo Ini</div>
+          
+          <div class="form-group" style="margin-bottom:12px;">
+            <label style="font-weight:700;">Nama Promo</label>
+            <input type="text" id="diskon-nama-promo" placeholder="cth: Diskon 20% Weekend" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+          </div>
+          
+          <div class="form-row" style="margin-bottom:12px;">
+            <div class="form-group">
+              <label style="font-weight:700;">Tanggal Mulai</label>
+              <input type="date" id="diskon-tgl-mulai" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+            </div>
+            <div class="form-group">
+              <label style="font-weight:700;">Tanggal Selesai</label>
+              <input type="date" id="diskon-tgl-selesai" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+            </div>
+          </div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <button onclick="resetFormDiskon()" class="btn" style="background:var(--muted);color:white;">
+              🔄 Reset
+            </button>
+            <button onclick="simpanPromoDiskon()" class="btn btn-primary">
+              ✅ Simpan Promo
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1492,6 +1537,74 @@
         <button class="btn btn-add" onclick="tambahBundleItem()">＋ Tambah Item dari Ringkasan</button>
 
         <div id="bundling-result" style="margin-top:16px;"></div>
+        
+        <!-- Form Simpan Promo Bundling -->
+        <div id="form-simpan-bundling" style="margin-top:20px;background:var(--bg);padding:16px;border-radius:12px;border:2px dashed var(--orange);">
+          <div style="font-weight:800;margin-bottom:12px;font-size:14px;">💾 Simpan Promo Bundling</div>
+          
+          <div class="form-group" style="margin-bottom:12px;">
+            <label style="font-weight:700;">Nama Promo</label>
+            <input type="text" id="bundling-nama-promo" placeholder="cth: Paket Hemat 3 Menu" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+          </div>
+          
+          <div style="margin-bottom:16px;">
+            <label style="font-weight:700;display:block;margin-bottom:8px;">💰 Pilih Harga Bundling</label>
+            <div id="bundling-harga-options" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+          
+          <div class="form-row" style="margin-bottom:12px;">
+            <div class="form-group">
+              <label style="font-weight:700;">Tanggal Mulai</label>
+              <input type="date" id="bundling-tgl-mulai" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+            </div>
+            <div class="form-group">
+              <label style="font-weight:700;">Tanggal Selesai</label>
+              <input type="date" id="bundling-tgl-selesai" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+            </div>
+          </div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <button onclick="resetFormBundling()" class="btn" style="background:var(--muted);color:white;">
+              🔄 Reset
+            </button>
+            <button onclick="simpanPromoBundling()" class="btn btn-primary">
+              ✅ Simpan Promo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: PROMO AKTIF -->
+    <div id="panel-aktif" class="promo-panel">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div class="card-title" style="margin:0;">📋 Daftar Promo Tersimpan</div>
+          <button onclick="exportPromosPDF()" class="btn btn-secondary" style="padding:8px 14px;font-size:12px;">
+            📄 Export PDF
+          </button>
+        </div>
+
+        <!-- Filter Status -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;">
+          <button onclick="filterPromos('all')" id="filter-all" class="btn btn-secondary" style="padding:8px 16px;font-size:13px;white-space:nowrap;background:var(--orange);color:white;">
+            📋 Semua
+          </button>
+          <button onclick="filterPromos('active')" id="filter-active" class="btn btn-secondary" style="padding:8px 16px;font-size:13px;white-space:nowrap;">
+            ✅ Aktif
+          </button>
+          <button onclick="filterPromos('upcoming')" id="filter-upcoming" class="btn btn-secondary" style="padding:8px 16px;font-size:13px;white-space:nowrap;">
+            🕒 Upcoming
+          </button>
+          <button onclick="filterPromos('expired')" id="filter-expired" class="btn btn-secondary" style="padding:8px 16px;font-size:13px;white-space:nowrap;">
+            ⏰ Expired
+          </button>
+        </div>
+
+        <!-- List Promo -->
+        <div id="promo-list-container"></div>
       </div>
     </div>
 
@@ -1527,6 +1640,7 @@
         <div class="form-group" style="margin-bottom:16px;">
           <label style="font-weight:700;margin-bottom:8px;display:block;">Channel Penjualan</label>
           <select id="bg-channel" onchange="toggleBeliGratisChannel()" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:700;width:100%;background:var(--card);">
+            <option value="">-- Pilih Channel Penjualan --</option>
             <option value="offline">🏪 Offline (tanpa platform fee)</option>
             <option value="online">📱 Online (GoFood/Shopee/Grab)</option>
           </select>
@@ -1542,7 +1656,7 @@
             <input type="number" id="bg-harga" placeholder="12000" min="0" oninput="hitungBeliGratis()" />
           </div>
         </div>
-        <div class="form-row" id="bg-fee-row" style="display:grid;">
+        <div class="form-row" id="bg-fee-row" style="display:none;">
           <div class="form-group">
             <label>Platform Fee (%) — GoFood/Shopee</label>
             <input type="number" id="bg-fee" value="20" min="0" max="100" oninput="hitungBeliGratis()" />
@@ -1554,47 +1668,134 @@
         </div>
 
         <div id="beli-gratis-result" style="display:none; margin-top:16px;"></div>
+        
+        <!-- Form Simpan Promo Beli Gratis -->
+        <div id="form-simpan-beli-gratis" style="margin-top:20px;background:var(--bg);padding:16px;border-radius:12px;border:2px dashed var(--orange);">
+          <div style="font-weight:800;margin-bottom:12px;font-size:14px;">💾 Simpan Promo Beli X Gratis Y</div>
+          
+          <div class="form-group" style="margin-bottom:12px;">
+            <label style="font-weight:700;">Nama Promo</label>
+            <input type="text" id="beli-gratis-nama-promo" placeholder="cth: Beli 2 Gratis 1" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+          </div>
+          
+          <div class="form-row" style="margin-bottom:12px;">
+            <div class="form-group">
+              <label style="font-weight:700;">Tanggal Mulai</label>
+              <input type="date" id="beli-gratis-tgl-mulai" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+            </div>
+            <div class="form-group">
+              <label style="font-weight:700;">Tanggal Selesai</label>
+              <input type="date" id="beli-gratis-tgl-selesai" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;" />
+            </div>
+          </div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <button onclick="resetFormBeliGratis()" class="btn" style="background:var(--muted);color:white;">
+              🔄 Reset
+            </button>
+            <button onclick="simpanPromoBeliGratis()" class="btn btn-primary">
+              ✅ Simpan Promo
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- PANEL: GENERATE POSTER -->
-  <div id="panel-poster" class="promo-panel">
-    <div class="card">
-      <div class="card-title" style="margin-bottom:16px;">🎨 Generate Poster Instagram</div>
-      
-      <div class="info-box" style="margin-bottom:16px;">
-        <span class="info-icon">✨</span>
-        <div>Buat poster promo siap pakai untuk Instagram/Facebook dengan logo Kedai Heula. Pilih jenis promo, isi detail, lalu download!</div>
+  <!-- TAB POS (KASIR) -->
+  <div id="tab-pos" class="tab-content">
+    <!-- Summary Bar (compact) -->
+    <div style="background:linear-gradient(135deg, var(--orange), var(--red));padding:12px 16px;margin:-24px -24px 16px;display:flex;justify-content:space-around;text-align:center;color:white;">
+      <div>
+        <div style="font-size:10px;opacity:0.9;">PENJUALAN</div>
+        <div style="font-size:18px;font-weight:800;" id="pos-total-revenue">Rp 0</div>
+      </div>
+      <div>
+        <div style="font-size:10px;opacity:0.9;">PROFIT</div>
+        <div style="font-size:18px;font-weight:800;" id="pos-total-profit">Rp 0</div>
+      </div>
+      <div>
+        <div style="font-size:10px;opacity:0.9;">TRANSAKSI</div>
+        <div style="font-size:18px;font-weight:800;" id="pos-total-trx">0</div>
+      </div>
+    </div>
+
+    <!-- Item Grid (touch-friendly) -->
+    <div style="margin-bottom:24px;">
+      <h3 style="font-size:14px;font-weight:800;margin-bottom:12px;color:var(--muted);">ITEM SATUAN</h3>
+      <div id="pos-menu-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;"></div>
+    </div>
+
+    <!-- Bundling Promo Grid -->
+    <div id="pos-bundling-section" style="margin-bottom:24px;">
+      <h3 style="font-size:14px;font-weight:800;margin-bottom:12px;color:var(--red);">📦 ITEM PROMO (BUNDLING)</h3>
+      <div id="pos-bundling-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;"></div>
+    </div>
+
+    <!-- Cart Button (floating) -->
+    <button onclick="togglePOSCart()" id="pos-cart-btn" style="position:fixed;bottom:24px;right:24px;width:64px;height:64px;border-radius:50%;background:var(--orange);color:white;border:none;box-shadow:0 4px 16px rgba(224,48,39,0.4);font-size:24px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;font-weight:800;">
+      🛒<span id="pos-cart-count" style="position:absolute;top:-4px;right:-4px;background:var(--red);width:24px;height:24px;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;">0</span>
+    </button>
+  </div>
+
+  <!-- SIDEBAR CART -->
+  <div id="pos-cart-sidebar" style="position:fixed;top:0;right:-100%;width:100%;max-width:400px;height:100vh;background:var(--card);box-shadow:-4px 0 20px rgba(0,0,0,0.2);z-index:200;transition:right 0.3s;overflow-y:auto;">
+    <div style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 style="font-size:20px;font-weight:800;">🛒 Keranjang</h3>
+        <button onclick="togglePOSCart()" style="background:none;border:none;font-size:28px;cursor:pointer;color:var(--muted);">✕</button>
       </div>
 
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-weight:700;">Jenis Promo</label>
-        <select id="poster-type" onchange="updatePosterPreview()" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:700;width:100%;background:var(--card);">
-          <option value="diskon">✂️ Diskon Persen</option>
-          <option value="bundling">📦 Paket Bundling</option>
-          <option value="beli-gratis">🎁 Beli X Gratis Y</option>
+      <!-- Cart Items -->
+      <div id="pos-cart-items" style="margin-bottom:20px;"></div>
+
+      <!-- Promo Selector (hanya muncul kalau cart isi item satuan saja) -->
+      <div id="pos-promo-section" style="background:var(--bg);border-radius:12px;padding:12px;margin-bottom:16px;display:none;">
+        <label style="font-weight:700;display:block;margin-bottom:8px;font-size:13px;">🏷️ Gunakan Promo?</label>
+        <select id="pos-promo-select" onchange="applyPromoToPOS()" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);font-weight:600;background:var(--card);">
+          <option value="">Tanpa Promo</option>
         </select>
       </div>
 
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-weight:700;">Judul Promo</label>
-        <input type="text" id="poster-title" placeholder="cth: DISKON 30% SEMUA MENU!" oninput="updatePosterPreview()" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:700;width:100%;background:var(--card);" />
+      <!-- Summary -->
+      <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:20px;">
+        <div id="pos-promo-discount" style="display:none;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--border);">
+          <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--red);">
+            <span>Diskon Promo:</span>
+            <span style="font-weight:700;" id="pos-discount-amount">- Rp 0</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-weight:700;">Subtotal:</span>
+          <span style="font-weight:800;font-size:20px;" id="pos-subtotal">Rp 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--green);">
+          <span>Profit:</span>
+          <span id="pos-profit" style="font-weight:700;">Rp 0</span>
+        </div>
       </div>
 
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-weight:700;">Detail Promo</label>
-        <textarea id="poster-detail" placeholder="cth: Berlaku untuk semua jenis Takoyaki & Dimsum&#10;Periode: 15-28 Feb 2026&#10;Pembelian min. Rp 50.000" oninput="updatePosterPreview()" rows="4" style="padding:12px;border-radius:12px;border:2px solid var(--border);font-size:14px;font-weight:600;width:100%;background:var(--card);resize:vertical;"></textarea>
+      <!-- Payment -->
+      <div style="margin-bottom:20px;">
+        <label style="font-weight:700;display:block;margin-bottom:8px;">💵 Uang Dibayar</label>
+        <input type="number" id="pos-bayar" placeholder="50000" oninput="hitungKembalianPOS()" style="width:100%;padding:14px;border-radius:12px;border:2px solid var(--border);font-size:18px;font-weight:700;background:var(--card);" />
       </div>
 
-      <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px;">
-        <div style="font-weight:700;margin-bottom:12px;font-size:14px;">📱 Preview Poster (1080x1080px)</div>
-        <canvas id="poster-canvas" width="1080" height="1080" style="width:100%;max-width:400px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);"></canvas>
+      <div style="background:var(--bg);border-radius:12px;padding:12px;margin-bottom:20px;text-align:center;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Kembalian</div>
+        <div id="pos-kembalian" style="font-size:24px;font-weight:800;color:var(--green);">Rp 0</div>
       </div>
 
-      <button class="btn btn-primary" onclick="downloadPoster()" style="width:100%;padding:14px;font-size:15px;">
-        📥 Download Poster PNG
+      <!-- Buttons -->
+      <button onclick="lihatDetailOrderCart()" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--orange);background:var(--card);color:var(--orange);font-weight:800;cursor:pointer;font-size:14px;margin-bottom:10px;">
+        🧾 Lihat Detail Order
+      </button>
+      <button onclick="simpanTransaksiPOS()" class="btn btn-primary" style="width:100%;padding:16px;font-size:16px;font-weight:800;margin-bottom:12px;">
+        ✅ SELESAI - Simpan Transaksi
+      </button>
+      <button onclick="clearPOSCart()" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--card);color:var(--red);font-weight:700;cursor:pointer;font-size:14px;">
+        🗑️ Kosongkan Keranjang
       </button>
     </div>
   </div>
@@ -1848,6 +2049,36 @@
 <!-- PRINT AREA -->
 <div id="print-area"></div>
 
+<!-- MODAL KONFIRMASI CUSTOM (pengganti confirm() yang diblok di sandbox) -->
+<div id="modal-konfirmasi" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);">
+  <div style="background:var(--card);border-radius:20px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;">
+    <div style="padding:20px 20px 0;">
+      <div style="font-size:36px;text-align:center;margin-bottom:10px;" id="konfirmasi-icon">⚠️</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--dark);text-align:center;margin-bottom:8px;" id="konfirmasi-title">Konfirmasi</div>
+      <div style="font-size:14px;color:var(--muted);text-align:center;font-weight:600;line-height:1.5;margin-bottom:20px;" id="konfirmasi-message">Yakin?</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:2px solid var(--border);">
+      <button id="konfirmasi-batal" onclick="tutupKonfirmasi()" style="padding:16px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;border-right:1px solid var(--border);">Batal</button>
+      <button id="konfirmasi-ok" onclick="eksekusiKonfirmasi()" style="padding:16px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:var(--red);cursor:pointer;">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOTA / DETAIL ORDER -->
+<div id="modal-nota" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);">
+  <div style="background:var(--card);border-radius:20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="position:sticky;top:0;background:var(--card);padding:16px 20px 12px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;border-radius:20px 20px 0 0;">
+      <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--red);">🧾 Detail Order</div>
+      <button onclick="tutupNota()" style="background:var(--bg);border:2px solid var(--border);border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div id="nota-body" style="padding:20px;"></div>
+    <div style="position:sticky;bottom:0;background:var(--card);padding:14px 20px;border-top:2px solid var(--border);display:flex;gap:10px;border-radius:0 0 20px 20px;">
+      <button onclick="printNota()" class="btn btn-primary" style="flex:1;">🖨️ Print Nota</button>
+      <button onclick="tutupNota()" class="btn btn-secondary" style="flex:1;">Tutup</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">✅ Tersimpan!</div>
 
@@ -1865,12 +2096,17 @@ let lastNama = '';
 // =====================
 // INIT
 // =====================
+// Ensure all functions are defined before DOM ready
 window.onload = () => {
-  tambahBahan(); tambahBahan(); tambahBahan();
-  tambahBiaya();
-  renderRingkasan();
-  tambahBundleItem();
-  tambahBundleItem();
+  try {
+    tambahBahan(); tambahBahan(); tambahBahan();
+    tambahBiaya();
+    renderRingkasan();
+    tambahBundleItem();
+    tambahBundleItem();
+  } catch(e) {
+    console.error('Init error:', e);
+  }
 };
 
 // =====================
@@ -1888,7 +2124,14 @@ function switchTab(id) {
     refreshAllBundleDropdowns();
     refreshDropdownBeliGratis();
   }
+  if (id === 'pos') {
+    renderPOSGrid();
+    renderPOSBundling();
+    updatePOSSummary();
+    refreshPromoDropdown();
+  }
 }
+
 
 
 // =====================
@@ -2007,15 +2250,30 @@ function hitungHPP() {
   const harga50 = roundHargaMakanan(hpp / (1 - 0.50));
   const harga70 = roundHargaMakanan(hpp / (1 - 0.70));
 
-  // Offline (harga normal)
-  document.getElementById('harga-30-offline').textContent = formatRp(harga30);
-  document.getElementById('harga-50-offline').textContent = formatRp(harga50);
-  document.getElementById('harga-70-offline').textContent = formatRp(harga70);
+  // Simpan ke hidden input (dipakai oleh updateHargaTerpilih)
+  document.getElementById('harga-30-offline').value = harga30;
+  document.getElementById('harga-50-offline').value = harga50;
+  document.getElementById('harga-70-offline').value = harga70;
+  document.getElementById('harga-30-online').value = roundHargaMakanan(harga30 * 1.25);
+  document.getElementById('harga-50-online').value = roundHargaMakanan(harga50 * 1.25);
+  document.getElementById('harga-70-online').value = roundHargaMakanan(harga70 * 1.25);
 
-  // Online (markup 25% untuk cover fee 20%)
-  document.getElementById('harga-30-online').textContent = formatRp(roundHargaMakanan(harga30 * 1.25));
-  document.getElementById('harga-50-online').textContent = formatRp(roundHargaMakanan(harga50 * 1.25));
-  document.getElementById('harga-70-online').textContent = formatRp(roundHargaMakanan(harga70 * 1.25));
+  // Set default ke STANDAR & OFFLINE, lalu update tampilan
+  selectedMargin = 50;
+  selectedChannel = 'offline';
+  selectedHargaJual = harga50;
+
+  // Highlight tombol STANDAR sebagai default
+  [30, 50, 70].forEach(m => {
+    const btn = document.getElementById('btn-kategori-' + m);
+    if (!btn) return;
+    btn.style.boxShadow = m === 50 ? '0 4px 12px rgba(0,0,0,0.15)' : '';
+    btn.style.transform = m === 50 ? 'scale(1.05)' : '';
+  });
+
+  // Tampilkan channel selector
+  document.getElementById('channel-selector').style.display = 'block';
+  updateHargaTerpilih();
 
   // Breakdown table
   const tbody = document.getElementById('breakdown-body');
@@ -2061,13 +2319,19 @@ function simpanMenu() {
   const nama = lastSnapshot.nama || document.getElementById('nama-menu').value.trim() || 'Menu Tanpa Nama';
   const kategori = lastSnapshot.kategori || document.getElementById('kategori-menu').value;
   const hpp = lastHPP;
-  const hargaJual = roundHargaMakanan(hpp / (1 - 0.50));
+  
+  // Pakai harga yang dipilih user, fallback ke STANDAR offline jika belum pilih
+  const hargaJual = selectedHargaJual > 0
+    ? selectedHargaJual
+    : roundHargaMakanan(hpp / (1 - 0.50));
+  const margin = selectedHargaJual > 0 ? selectedMargin : 50;
 
   const obj = {
     nama, kategori,
     porsi: lastSnapshot.porsi,
     kemasan: lastSnapshot.kemasan,
-    hpp, hargaJual, margin: 50,
+    hpp, hargaJual, margin,
+    channel: selectedChannel,
     tanggal: getWIBDateTimeString(), // WIB timezone
     totalBatch: lastSnapshot.totalBatch,
     bahanRaw: lastSnapshot.bahanRaw || [],
@@ -2083,11 +2347,18 @@ function simpanMenu() {
   showToast(`✅ "${nama}" tersimpan!`);
 
   setTimeout(() => {
-    if (confirm(`"${nama}" berhasil disimpan! 🎉\n\nMau langsung input menu baru? Klik OK untuk reset form, atau Batal untuk tetap di halaman ini.`)) {
-      resetForm();
-      lastSnapshot = {};
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    showKonfirmasi({
+      icon: '🎉',
+      title: `"${nama}" Tersimpan!`,
+      message: 'Mau langsung input menu baru? Atau tetap di halaman ini.',
+      labelOk: '➕ Input Menu Baru',
+      onOk: () => {
+        resetForm();
+        lastSnapshot = {};
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+    document.getElementById('konfirmasi-batal').textContent = 'Tetap di sini';
   }, 300);
 }
 
@@ -2230,22 +2501,35 @@ function renderRingkasan() {
 }
 
 function hapusSemua() {
-  if (confirm('Yakin mau hapus semua data menu?')) {
-    menuList = [];
-    localStorage.removeItem('kedaiHeula_menu');
-    renderRingkasan();
-  }
+  showKonfirmasi({
+    icon: '🗑️',
+    title: 'Hapus Semua Menu?',
+    message: 'Semua data menu yang tersimpan akan dihapus permanen.',
+    labelOk: 'Ya, Hapus Semua',
+    onOk: () => {
+      menuList = [];
+      localStorage.removeItem('kedaiHeula_menu');
+      renderRingkasan();
+      showToast('🗑️ Semua menu dihapus');
+    }
+  });
 }
 
 function hapusItem(i) {
   menuList = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
   if (!menuList[i]) return;
-  if (confirm(`Hapus "${menuList[i].nama}"?`)) {
-    menuList.splice(i, 1);
-    localStorage.setItem('kedaiHeula_menu', JSON.stringify(menuList));
-    renderRingkasan();
-    showToast('🗑️ Menu dihapus');
-  }
+  showKonfirmasi({
+    icon: '🗑️',
+    title: `Hapus "${menuList[i].nama}"?`,
+    message: 'Menu ini akan dihapus dari Ringkasan secara permanen.',
+    labelOk: 'Ya, Hapus',
+    onOk: () => {
+      menuList.splice(i, 1);
+      localStorage.setItem('kedaiHeula_menu', JSON.stringify(menuList));
+      renderRingkasan();
+      showToast('🗑️ Menu dihapus');
+    }
+  });
 }
 
 // =====================
@@ -2748,81 +3032,890 @@ function tutupEdit() {
   document.getElementById('modal-edit').style.display = 'none';
 }
 
+
 // =====================
-// GENERATE POSTER INSTAGRAM
+// POS (POINT OF SALE) - Grid + Sidebar Cart
 // =====================
-function updatePosterPreview() {
-  const canvas = document.getElementById('poster-canvas');
-  if (!canvas) return;
+let posCart = {}; // { menuIdx: qty }
+
+// Global Laporan variables
+let currentPeriode = 'hari';
+let chartProfit = null;
+
+// Global bundling harga (populated by hitungBundling)
+let bundlingHargaData = {
+  offlineHemat: 0,
+  offlineStandar: 0,
+  offlinePremium: 0,
+  onlineHemat: 0,
+  onlineStandar: 0,
+  onlinePremium: 0,
+  profitOfflineHemat: 0,
+  profitOfflineStandar: 0,
+  profitOfflinePremium: 0,
+  profitOnlineHemat: 0,
+  profitOnlineStandar: 0,
+  profitOnlinePremium: 0
+};
+
+function renderPOSGrid() {
+  const grid = document.getElementById('pos-menu-grid');
+  if (!grid) return;
   
-  const ctx = canvas.getContext('2d');
-  const w = 1080;
-  const h = 1080;
+  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
   
-  const type = document.getElementById('poster-type')?.value || 'diskon';
-  const title = document.getElementById('poster-title')?.value || 'PROMO SPESIAL!';
-  const detail = document.getElementById('poster-detail')?.value || 'Periode terbatas';
+  if (data.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--muted);">
+        <div style="font-size:48px;margin-bottom:12px;">🍱</div>
+        <p style="font-weight:700;">Belum ada menu</p>
+        <small>Hitung HPP dulu di tab "Hitung HPP"</small>
+      </div>
+    `;
+    return;
+  }
   
-  // Background gradient orange
-  const gradient = ctx.createLinearGradient(0, 0, 0, h);
-  gradient.addColorStop(0, '#FF8C42');
-  gradient.addColorStop(0.5, '#F47C20');
-  gradient.addColorStop(1, '#E03027');
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, w, h);
-  
-  // White card
-  ctx.fillStyle = '#FFFAF5';
-  ctx.beginPath();
-  ctx.roundRect(80, 200, 920, 680, 40);
-  ctx.fill();
-  
-  // Title
-  ctx.fillStyle = '#E03027';
-  ctx.font = 'bold 72px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(title.toUpperCase(), w/2, 400);
-  
-  // Detail
-  ctx.fillStyle = '#1A1A1A';
-  ctx.font = '500 42px Arial';
-  const lines = detail.split('\n');
-  let y = 520;
-  lines.forEach(line => {
-    ctx.fillText(line, w/2, y);
-    y += 60;
+  let html = '';
+  const cartType = getCartType();
+  const isBlocked = cartType === 'bundling'; // item satuan diblok kalau cart ada bundling
+
+  data.forEach((menu, idx) => {
+    const inCart = posCart[idx] || 0;
+    const fotoUrl = menu.foto || '';
+    const blocked = isBlocked;
+    const opacity = blocked ? '0.4' : '1';
+    const cursor = blocked ? 'not-allowed' : 'pointer';
+    const borderColor = inCart > 0 ? 'var(--orange)' : 'var(--border)';
+    
+    html += `
+      <div onclick="addToCart(${idx})" title="${blocked ? 'Kosongkan keranjang dulu untuk tambah item satuan' : ''}" style="background:var(--card);border:2px solid ${borderColor};border-radius:16px;padding:12px;cursor:${cursor};transition:all 0.2s;position:relative;opacity:${opacity};" ${!blocked ? `onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'"` : ''}>
+        ${fotoUrl ? `<img src="${fotoUrl}" style="width:100%;height:100px;object-fit:cover;border-radius:12px;margin-bottom:8px;" />` : `<div style="width:100%;height:100px;background:linear-gradient(135deg,var(--bg),var(--border));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:8px;">${getCategoryEmoji(menu.kategori)}</div>`}
+        <div style="font-weight:800;font-size:13px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${menu.nama}</div>
+        <div style="font-weight:800;color:var(--orange);font-size:14px;">${formatRp(menu.hargaJual)}</div>
+        ${inCart > 0 ? `<div style="position:absolute;top:8px;right:8px;background:var(--orange);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">${inCart}</div>` : ''}
+        ${blocked ? `<div style="position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;"><span style="background:rgba(0,0,0,0.55);color:white;font-size:10px;font-weight:800;padding:4px 8px;border-radius:8px;">🚫 Item Promo Aktif</span></div>` : ''}
+      </div>
+    `;
   });
   
-  // Footer
-  ctx.fillStyle = 'white';
-  ctx.font = 'bold 36px Arial';
-  ctx.fillText('Kedai Heula - Jajanan Mantap Pisan!', w/2, h - 100);
-  
-  // Logo circle
-  ctx.fillStyle = 'white';
-  ctx.beginPath();
-  ctx.arc(w/2, 120, 80, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#F47C20';
-  ctx.font = 'bold 64px Arial';
-  ctx.fillText('🍱', w/2, 145);
+  grid.innerHTML = html;
 }
 
-function downloadPoster() {
-  const canvas = document.getElementById('poster-canvas');
-  if (!canvas) return;
+function renderPOSBundling() {
+  const grid = document.getElementById('pos-bundling-grid');
+  const section = document.getElementById('pos-bundling-section');
+  if (!grid || !section) return;
   
-  const link = document.createElement('a');
-  link.download = `kedai-heula-poster-${Date.now()}.png`;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-  showToast('✅ Poster berhasil didownload!');
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Filter active bundling promos only
+  const activeBundling = promos.filter(p => 
+    p.type === 'bundling' && 
+    p.periodeMulai <= today && 
+    p.periodeSelesai >= today
+  );
+  
+  if (activeBundling.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  
+  section.style.display = 'block';
+  
+  let html = '';
+  const cartType = getCartType();
+  const isBlocked = cartType === 'satuan'; // bundling diblok kalau cart ada item satuan
+
+  activeBundling.forEach((promo, idx) => {
+    const inCart = posCart['b-' + promo.id] || 0;
+    const blocked = isBlocked;
+    const opacity = blocked ? '0.4' : '1';
+    const cursor = blocked ? 'not-allowed' : 'pointer';
+
+    html += `
+      <div onclick="addBundlingToCart('${promo.id}')" title="${blocked ? 'Kosongkan keranjang dulu untuk tambah item promo' : ''}" style="background:linear-gradient(135deg,#FFF4E6,#FFEBCD);border:2px solid ${inCart > 0 ? 'var(--red)' : 'var(--orange)'};border-radius:16px;padding:12px;cursor:${cursor};transition:all 0.2s;position:relative;opacity:${opacity};" ${!blocked ? `onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'"` : ''}>
+        <div style="width:100%;height:100px;background:linear-gradient(135deg,var(--orange),var(--red));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:8px;">📦</div>
+        <div style="font-weight:800;font-size:13px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${promo.nama}</div>
+        <div style="font-weight:800;color:var(--red);font-size:14px;">${formatRp(promo.harga || 0)}</div>
+        <div style="position:absolute;top:8px;right:8px;background:var(--red);color:white;padding:4px 8px;border-radius:8px;font-weight:700;font-size:10px;">PROMO</div>
+        ${inCart > 0 ? `<div style="position:absolute;top:8px;left:8px;background:var(--orange);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">${inCart}</div>` : ''}
+        ${blocked ? `<div style="position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;"><span style="background:rgba(0,0,0,0.55);color:white;font-size:10px;font-weight:800;padding:4px 8px;border-radius:8px;">🚫 Item Satuan Aktif</span></div>` : ''}
+      </div>
+    `;
+  });
+  
+  grid.innerHTML = html;
+}
+
+// Bangun objek transaksi dari cart aktif (tanpa simpan)
+function buildTransaksiFromCart() {
+  const cartKeys = Object.keys(posCart);
+  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const subtotalEl = document.getElementById('pos-subtotal');
+  const subtotal = parseFloat((subtotalEl?.textContent || '').replace(/[^0-9]/g, '')) || 0;
+  const bayar = parseFloat(document.getElementById('pos-bayar')?.value) || 0;
+
+  const items = cartKeys.map(key => {
+    const qty = posCart[key];
+    const isBundling = key.toString().startsWith('b-');
+    if (isBundling) {
+      const promo = promos.find(p => p.id == key.slice(2));
+      if (!promo) return null;
+      return { nama: '📦 ' + promo.nama, kategori: 'bundling', qty, hpp: 0, harga: promo.harga || 0, subtotal: (promo.harga || 0) * qty, profit: (promo.harga || 0) * qty };
+    } else {
+      const menu = data[parseInt(key)];
+      if (!menu) return null;
+      return { nama: menu.nama, kategori: menu.kategori, qty, hpp: menu.hpp, harga: menu.hargaJual, subtotal: menu.hargaJual * qty, profit: (menu.hargaJual - menu.hpp) * qty };
+    }
+  }).filter(Boolean);
+
+  return { id: 'PREVIEW-' + Date.now(), timestamp: new Date().toISOString(), items, total: subtotal, bayar, kembalian: Math.max(0, bayar - subtotal) };
+}
+
+function lihatDetailOrderCart() {
+  if (Object.keys(posCart).length === 0) {
+    showToast('⚠️ Keranjang masih kosong');
+    return;
+  }
+  const t = buildTransaksiFromCart();
+  lihatNota(t);
+}
+function getCartType() {
+  const keys = Object.keys(posCart);
+  if (keys.length === 0) return 'empty';
+  const hasBundling = keys.some(k => k.toString().startsWith('b-'));
+  const hasSatuan   = keys.some(k => !k.toString().startsWith('b-'));
+  if (hasBundling) return 'bundling';
+  if (hasSatuan)   return 'satuan';
+  return 'empty';
+}
+
+function addBundlingToCart(promoId) {
+  // Cek konflik: kalau cart sudah ada item satuan, tolak
+  const cartType = getCartType();
+  if (cartType === 'satuan') {
+    showToast('⚠️ Kosongkan keranjang dulu sebelum tambah item promo');
+    return;
+  }
+
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const promo = promos.find(p => p.id == promoId);
+  if (!promo) { showToast('⚠️ Promo tidak ditemukan'); return; }
+
+  const key = 'b-' + promoId;
+  if (!posCart[key]) posCart[key] = 0;
+  posCart[key]++;
+
+  renderPOSGrid();
+  renderPOSBundling();
+  updateCartSidebar();
+  showToast(`➕ ${promo.nama} ditambahkan`);
+}
+
+function addToCart(menuIdx) {
+  // Cek konflik: kalau cart sudah ada item bundling, tolak
+  const cartType = getCartType();
+  if (cartType === 'bundling') {
+    showToast('⚠️ Kosongkan keranjang dulu sebelum tambah item satuan');
+    return;
+  }
+
+  if (!posCart[menuIdx]) posCart[menuIdx] = 0;
+  posCart[menuIdx]++;
+  
+  renderPOSGrid();
+  renderPOSBundling();
+  updateCartSidebar();
+  showToast('➕ Item ditambahkan');
+}
+
+function updateCartQty(menuIdx, qty) {
+  if (qty <= 0) {
+    delete posCart[menuIdx];
+  } else {
+    posCart[menuIdx] = qty;
+  }
+  
+  renderPOSGrid();
+  renderPOSBundling();
+  updateCartSidebar();
+}
+
+function updateCartSidebar() {
+  const container = document.getElementById('pos-cart-items');
+  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  
+  const cartKeys = Object.keys(posCart);
+  const totalQty = cartKeys.reduce((s, k) => s + posCart[k], 0);
+  
+  document.getElementById('pos-cart-count').textContent = totalQty;
+  
+  if (cartKeys.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--muted);">
+        <div style="font-size:48px;margin-bottom:12px;">🛒</div>
+        <p>Keranjang kosong</p>
+      </div>
+    `;
+    document.getElementById('pos-subtotal').textContent = 'Rp 0';
+    document.getElementById('pos-profit').textContent = 'Rp 0';
+    return;
+  }
+  
+  let html = '';
+  let subtotal = 0;
+  let totalHPP = 0;
+  
+  cartKeys.forEach(key => {
+    const qty = posCart[key];
+    const isBundling = key.startsWith('b-');
+
+    if (isBundling) {
+      // Item bundling
+      const promoId = key.slice(2);
+      const promo = promos.find(p => p.id == promoId);
+      if (!promo) return;
+      const harga = promo.harga || 0;
+      const itemTotal = harga * qty;
+      subtotal += itemTotal;
+      // HPP bundling tidak diketahui secara tepat, set 0 (profit = harga bundling)
+      html += `
+        <div style="background:linear-gradient(135deg,#FFF4E6,#FFEBCD);border:2px solid var(--orange);border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+                <span style="background:var(--red);color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;">PROMO</span>
+                <span style="font-weight:800;">📦 ${promo.nama}</span>
+              </div>
+              <div style="font-size:13px;color:var(--muted);">${formatRp(harga)} × ${qty}</div>
+            </div>
+            <div style="font-weight:800;color:var(--orange);">${formatRp(itemTotal)}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button onclick="updateCartQty('${key}', ${qty - 1})" style="width:32px;height:32px;border-radius:8px;border:2px solid var(--border);background:var(--card);font-size:18px;font-weight:800;cursor:pointer;">−</button>
+            <input type="number" value="${qty}" onchange="updateCartQty('${key}', parseInt(this.value) || 0)" style="width:60px;text-align:center;padding:6px;border-radius:8px;border:2px solid var(--border);font-weight:800;background:var(--card);" />
+            <button onclick="updateCartQty('${key}', ${qty + 1})" style="width:32px;height:32px;border-radius:8px;border:2px solid var(--border);background:var(--card);font-size:18px;font-weight:800;cursor:pointer;">+</button>
+            <button onclick="updateCartQty('${key}', 0)" style="margin-left:auto;padding:6px 12px;border-radius:8px;border:none;background:var(--light-red);color:var(--red);font-weight:700;cursor:pointer;">🗑️</button>
+          </div>
+        </div>
+      `;
+    } else {
+      // Item menu biasa
+      const menu = data[parseInt(key)];
+      if (!menu) return;
+      const itemTotal = menu.hargaJual * qty;
+      const itemHPP = menu.hpp * qty;
+      subtotal += itemTotal;
+      totalHPP += itemHPP;
+      html += `
+        <div style="background:var(--bg);border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+            <div style="flex:1;">
+              <div style="font-weight:800;margin-bottom:4px;">${menu.nama}</div>
+              <div style="font-size:13px;color:var(--muted);">${formatRp(menu.hargaJual)} × ${qty}</div>
+            </div>
+            <div style="font-weight:800;color:var(--orange);">${formatRp(itemTotal)}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button onclick="updateCartQty(${key}, ${qty - 1})" style="width:32px;height:32px;border-radius:8px;border:2px solid var(--border);background:var(--card);font-size:18px;font-weight:800;cursor:pointer;">−</button>
+            <input type="number" value="${qty}" onchange="updateCartQty(${key}, parseInt(this.value) || 0)" style="width:60px;text-align:center;padding:6px;border-radius:8px;border:2px solid var(--border);font-weight:800;background:var(--card);" />
+            <button onclick="updateCartQty(${key}, ${qty + 1})" style="width:32px;height:32px;border-radius:8px;border:2px solid var(--border);background:var(--card);font-size:18px;font-weight:800;cursor:pointer;">+</button>
+            <button onclick="updateCartQty(${key}, 0)" style="margin-left:auto;padding:6px 12px;border-radius:8px;border:none;background:var(--light-red);color:var(--red);font-weight:700;cursor:pointer;">🗑️</button>
+          </div>
+        </div>
+      `;
+    }
+  });
+  
+  container.innerHTML = html;
+  
+  const profit = subtotal - totalHPP;
+  document.getElementById('pos-subtotal').textContent = formatRp(subtotal);
+  document.getElementById('pos-profit').textContent = formatRp(profit);
+
+  // Tampilkan/sembunyikan "Gunakan Promo?" berdasarkan tipe cart
+  const cartType = getCartType();
+  const promoSection = document.getElementById('pos-promo-section');
+  if (promoSection) {
+    if (cartType === 'satuan') {
+      promoSection.style.display = 'block';
+      refreshPromoDropdown();
+    } else {
+      promoSection.style.display = 'none';
+      // Reset diskon kalau disembunyikan
+      document.getElementById('pos-promo-discount').style.display = 'none';
+      document.getElementById('pos-promo-select').value = '';
+    }
+  }
+  
+  hitungKembalianPOS();
+}
+
+function togglePOSCart() {
+  const sidebar = document.getElementById('pos-cart-sidebar');
+  const currentRight = sidebar.style.right;
+  
+  if (currentRight === '0px') {
+    sidebar.style.right = '-100%';
+  } else {
+    sidebar.style.right = '0px';
+  }
+}
+
+function clearPOSCart() {
+  showKonfirmasi({
+    icon: '🗑️',
+    title: 'Kosongkan Keranjang?',
+    message: 'Semua item di keranjang akan dihapus.',
+    labelOk: 'Ya, Kosongkan',
+    onOk: () => {
+      posCart = {};
+      renderPOSGrid();
+      renderPOSBundling();
+      updateCartSidebar();
+      showToast('🗑️ Keranjang dikosongkan');
+    }
+  });
+}
+
+function hitungKembalianPOS() {
+  const subtotalText = document.getElementById('pos-subtotal').textContent;
+  const subtotal = parseFloat(subtotalText.replace(/[^0-9]/g, '')) || 0;
+  const bayar = parseFloat(document.getElementById('pos-bayar').value) || 0;
+  const kembalian = bayar - subtotal;
+  
+  const kembalianEl = document.getElementById('pos-kembalian');
+  kembalianEl.textContent = formatRp(kembalian >= 0 ? kembalian : 0);
+  kembalianEl.style.color = kembalian >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+function simpanTransaksiPOS() {
+  const cartKeys = Object.keys(posCart);
+  
+  if (cartKeys.length === 0) {
+    showToast('⚠️ Keranjang kosong');
+    return;
+  }
+  
+  const subtotalText = document.getElementById('pos-subtotal').textContent;
+  const subtotal = parseFloat(subtotalText.replace(/[^0-9]/g, '')) || 0;
+  const bayar = parseFloat(document.getElementById('pos-bayar').value) || 0;
+  
+  if (bayar < subtotal) {
+    showToast('⚠️ Uang dibayar kurang!');
+    return;
+  }
+  
+  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const transaksi = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    items: cartKeys.map(key => {
+      const qty = posCart[key];
+      const isBundling = key.toString().startsWith('b-');
+      if (isBundling) {
+        const promoId = key.slice(2);
+        const promo = promos.find(p => p.id == promoId);
+        if (!promo) return null;
+        return {
+          nama: '📦 ' + promo.nama,
+          kategori: 'bundling',
+          qty: qty,
+          hpp: 0,
+          harga: promo.harga || 0,
+          subtotal: (promo.harga || 0) * qty,
+          profit: (promo.harga || 0) * qty
+        };
+      } else {
+        const menu = data[parseInt(key)];
+        if (!menu) return null;
+        return {
+          nama: menu.nama,
+          kategori: menu.kategori,
+          qty: qty,
+          hpp: menu.hpp,
+          harga: menu.hargaJual,
+          subtotal: menu.hargaJual * qty,
+          profit: (menu.hargaJual - menu.hpp) * qty
+        };
+      }
+    }).filter(Boolean),
+    total: subtotal,
+    bayar: bayar,
+    kembalian: bayar - subtotal
+  };
+  
+  const today = new Date().toISOString().split('T')[0];
+  const key = `kedaiHeula_pos_${today}`;
+  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+  existing.push(transaksi);
+  localStorage.setItem(key, JSON.stringify(existing));
+  
+  // Reset cart & UI
+  posCart = {};
+  document.getElementById('pos-bayar').value = '';
+  renderPOSGrid();
+  renderPOSBundling();
+  updateCartSidebar();
+  updatePOSSummary();
+
+  // Langsung tampilkan nota untuk print
+  lihatNota(transaksi);
+  showToast('✅ Transaksi berhasil!');
+}
+
+function updatePOSSummary() {
+  const today = new Date().toISOString().split('T')[0];
+  const key = `kedaiHeula_pos_${today}`;
+  const transaksi = JSON.parse(localStorage.getItem(key) || '[]');
+  
+  let totalRevenue = 0;
+  let totalProfit = 0;
+  
+  transaksi.forEach(t => {
+    totalRevenue += t.total;
+    t.items.forEach(item => totalProfit += item.profit);
+  });
+  
+  document.getElementById('pos-total-revenue').textContent = formatRp(totalRevenue);
+  document.getElementById('pos-total-profit').textContent = formatRp(totalProfit);
+  document.getElementById('pos-total-trx').textContent = transaksi.length;
+}
+
+// =====================
+// PROMO MANAGEMENT
+// =====================
+// Simpan Promo Diskon
+function simpanPromoDiskon() {
+  const nama = document.getElementById('diskon-nama-promo')?.value?.trim();
+  const mulai = document.getElementById('diskon-tgl-mulai')?.value;
+  const selesai = document.getElementById('diskon-tgl-selesai')?.value;
+  
+  if (!nama || !mulai || !selesai) {
+    showToast('⚠️ Lengkapi semua field (nama, tanggal mulai & selesai)');
+    return;
+  }
+  
+  // Get data from simulation form
+  const menuNama = document.getElementById('d-nama')?.value || '';
+  const persen = parseFloat(document.getElementById('d-diskon')?.value) || 0;
+  const hargaNormal = parseFloat(document.getElementById('d-harga-normal')?.value) || 0;
+  
+  if (!menuNama || persen <= 0 || hargaNormal <= 0) {
+    showToast('⚠️ Harap lakukan simulasi terlebih dahulu');
+    return;
+  }
+  
+  const hargaPromo = Math.round(hargaNormal * (1 - persen/100));
+  
+  const promo = {
+    id: Date.now(),
+    nama,
+    type: 'diskon',
+    periodeMulai: mulai,
+    periodeSelesai: selesai,
+    menuNama,
+    persen,
+    hargaNormal,
+    hargaPromo,
+    created: new Date().toISOString()
+  };
+  
+  savePromo(promo);
+}
+
+// Helper untuk highlight selected harga bundling
+function selectBundlingHarga(radio) {
+  // Reset all labels
+  document.querySelectorAll('input[name="bundling-harga-promo"]').forEach(r => {
+    const lbl = r.closest('label');
+    if (lbl) {
+      lbl.style.borderColor = 'var(--border)';
+      lbl.style.background = 'var(--card)';
+    }
+  });
+  
+  // Check radio dan highlight label yang dipilih
+  radio.checked = true;
+  const lbl = radio.closest('label');
+  if (lbl) {
+    lbl.style.borderColor = 'var(--orange)';
+    lbl.style.background = '#FFF4E6';
+  }
+}
+
+// Simpan Promo Bundling
+function simpanPromoBundling() {
+  const nama = document.getElementById('bundling-nama-promo')?.value?.trim();
+  const mulai = document.getElementById('bundling-tgl-mulai')?.value;
+  const selesai = document.getElementById('bundling-tgl-selesai')?.value;
+  
+  if (!nama || !mulai || !selesai) {
+    showToast('⚠️ Lengkapi semua field');
+    return;
+  }
+  
+  // Get selected harga
+  const selectedHarga = document.querySelector('input[name="bundling-harga-promo"]:checked');
+  if (!selectedHarga) {
+    showToast('⚠️ Pilih harga bundling');
+    return;
+  }
+  
+  const harga = parseFloat(selectedHarga.value);
+  const hargaLabel = selectedHarga.getAttribute('data-label');
+  
+  const promo = {
+    id: Date.now(),
+    nama,
+    type: 'bundling',
+    periodeMulai: mulai,
+    periodeSelesai: selesai,
+    harga,
+    hargaLabel,
+    created: new Date().toISOString()
+  };
+  
+  savePromo(promo);
+}
+
+// Simpan Promo Beli Gratis
+function simpanPromoBeliGratis() {
+  const nama = document.getElementById('beli-gratis-nama-promo')?.value?.trim();
+  const mulai = document.getElementById('beli-gratis-tgl-mulai')?.value;
+  const selesai = document.getElementById('beli-gratis-tgl-selesai')?.value;
+  
+  if (!nama || !mulai || !selesai) {
+    showToast('⚠️ Lengkapi semua field');
+    return;
+  }
+  
+  const beli = parseInt(document.getElementById('bg-beli')?.value) || 0;
+  const gratis = parseInt(document.getElementById('bg-gratis')?.value) || 0;
+  
+  if (beli <= 0 || gratis <= 0) {
+    showToast('⚠️ Masukkan jumlah beli dan gratis');
+    return;
+  }
+  
+  const promo = {
+    id: Date.now(),
+    nama,
+    type: 'beli-gratis',
+    periodeMulai: mulai,
+    periodeSelesai: selesai,
+    beli,
+    gratis,
+    created: new Date().toISOString()
+  };
+  
+  savePromo(promo);
+}
+
+// Helper save promo
+function savePromo(promo) {
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  promos.push(promo);
+  localStorage.setItem('kedaiHeula_promos', JSON.stringify(promos));
+  
+  showToast(`✅ Promo "${promo.nama}" disimpan!`);
+  refreshPromoDropdown();
+  renderPromoList();
+  syncPromosToCloud();
+  
+  // Clear form and hide
+  if (promo.type === 'diskon') {
+    document.getElementById('diskon-nama-promo').value = '';
+    document.getElementById('diskon-tgl-mulai').value = '';
+    document.getElementById('diskon-tgl-selesai').value = '';
+    document.getElementById('form-simpan-diskon').style.display = 'none';
+  } else if (promo.type === 'bundling') {
+    document.getElementById('bundling-nama-promo').value = '';
+    document.getElementById('bundling-tgl-mulai').value = '';
+    document.getElementById('bundling-tgl-selesai').value = '';
+    // Reset pilihan harga
+    document.querySelectorAll('input[name="bundling-harga-promo"]').forEach(r => {
+      r.checked = false;
+      r.closest('label').style.borderColor = 'var(--border)';
+      r.closest('label').style.background = 'var(--card)';
+    });
+    // form-simpan-bundling tetap visible
+  } else if (promo.type === 'beli-gratis') {
+    document.getElementById('beli-gratis-nama-promo').value = '';
+    document.getElementById('beli-gratis-tgl-mulai').value = '';
+    document.getElementById('beli-gratis-tgl-selesai').value = '';
+    // form-simpan-beli-gratis selalu visible, tidak perlu di-hide
+  }
+}
+
+
+
+function refreshPromoDropdown() {
+  const sel = document.getElementById('pos-promo-select');
+  if (!sel) return;
+  
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Filter hanya promo aktif
+  const activePromos = promos.filter(p => 
+    p.periodeMulai <= today && p.periodeSelesai >= today
+  );
+  
+  let html = '<option value="">Tanpa Promo</option>';
+  activePromos.forEach(p => {
+    const idx = promos.indexOf(p);
+    const label = p.type === 'diskon' ? `${p.persen}%` : 
+                  p.type === 'bundling' ? 'Paket' : 
+                  p.type === 'beli-dapat' ? 'Beli X Gratis Y' : '';
+    html += `<option value="${idx}">🏷️ ${p.nama} ${label ? `(${label})` : ''}</option>`;
+  });
+  
+  if (activePromos.length === 0) {
+    html += '<option value="" disabled>⚠️ Tidak ada promo aktif</option>';
+  }
+  
+  sel.innerHTML = html;
+}
+
+function applyPromoToPOS() {
+  const sel = document.getElementById('pos-promo-select');
+  const idx = sel.value;
+  
+  if (idx === '') {
+    // No promo
+    document.getElementById('pos-promo-discount').style.display = 'none';
+    updateCartSidebar();
+    return;
+  }
+  
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const promo = promos[parseInt(idx)];
+  
+  if (!promo) return;
+  
+  // Calculate discount
+  const subtotalText = document.getElementById('pos-subtotal').textContent;
+  const subtotal = parseFloat(subtotalText.replace(/[^0-9]/g, '')) || 0;
+  
+  let discount = 0;
+  if (promo.type === 'diskon') {
+    discount = subtotal * (promo.persen / 100);
+  }
+  
+  // Show discount
+  document.getElementById('pos-promo-discount').style.display = 'block';
+  document.getElementById('pos-discount-amount').textContent = '- ' + formatRp(discount);
+  
+  // Update subtotal
+  const newSubtotal = subtotal - discount;
+  document.getElementById('pos-subtotal').textContent = formatRp(newSubtotal);
+  
+  hitungKembalianPOS();
+}
+
+// Render daftar promo
+function renderPromoList(filter = 'all') {
+  const container = document.getElementById('promo-list-container');
+  if (!container) return;
+  
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const today = new Date().toISOString().split('T')[0];
+  
+  let filtered = promos.filter(p => {
+    if (filter === 'all') return true;
+    if (filter === 'active') return p.periodeMulai <= today && p.periodeSelesai >= today;
+    if (filter === 'upcoming') return p.periodeMulai > today;
+    if (filter === 'expired') return p.periodeSelesai < today;
+    return true;
+  });
+  
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">🏷️</div>
+        <p>Belum ada promo tersimpan</p>
+        <small>Buat promo di tab Diskon/Bundling/Beli Gratis, lalu klik Simpan</small>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  filtered.forEach((p, idx) => {
+    const isActive = p.periodeMulai <= today && p.periodeSelesai >= today;
+    const isUpcoming = p.periodeMulai > today;
+    const status = isActive ? '✅ Aktif' : isUpcoming ? '🕒 Upcoming' : '⏰ Expired';
+    const statusColor = isActive ? 'var(--green)' : isUpcoming ? 'var(--orange)' : 'var(--muted)';
+    
+    // Find real index in full promos array
+    const realIdx = promos.findIndex(promo => promo.id === p.id);
+    
+    html += `
+      <div style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="font-weight:800;font-size:15px;margin-bottom:4px;">${p.nama}</div>
+            <div style="font-size:12px;color:${statusColor};font-weight:700;">${status}</div>
+          </div>
+          <span style="background:var(--bg);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;">
+            ${p.type === 'diskon' ? `${p.persen}%` : p.type}
+          </span>
+        </div>
+        
+        <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">
+          📅 ${formatTanggal(p.periodeMulai)} - ${formatTanggal(p.periodeSelesai)}
+        </div>
+        
+        ${p.menuNama ? `<div style="font-size:13px;margin-bottom:10px;">Menu: <strong>${p.menuNama}</strong></div>` : ''}
+        ${p.harga ? `<div style="font-size:13px;margin-bottom:10px;">Harga: <strong>${formatRp(p.harga)}</strong> ${p.hargaLabel ? `(${p.hargaLabel})` : ''}</div>` : ''}
+        
+        <div style="display:flex;gap:8px;">
+          <button onclick="editPromo(${realIdx})" class="btn btn-secondary" style="padding:8px 14px;font-size:12px;">✏️ Edit</button>
+          <button onclick="hapusPromo(${realIdx})" style="padding:8px 14px;font-size:12px;border-radius:8px;border:none;background:var(--light-red);color:var(--red);font-weight:700;cursor:pointer;">🗑️ Hapus</button>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+function filterPromos(filter) {
+  // Update button styles
+  ['all', 'active', 'upcoming', 'expired'].forEach(f => {
+    const btn = document.getElementById(`filter-${f}`);
+    if (btn) {
+      if (f === filter) {
+        btn.style.background = 'var(--orange)';
+        btn.style.color = 'white';
+      } else {
+        btn.style.background = '';
+        btn.style.color = '';
+      }
+    }
+  });
+  
+  renderPromoList(filter);
+}
+
+// Reset Form Functions
+function resetFormDiskon() {
+  document.getElementById('diskon-nama-promo').value = '';
+  document.getElementById('diskon-tgl-mulai').value = '';
+  document.getElementById('diskon-tgl-selesai').value = '';
+  document.getElementById('d-nama').value = '';
+  document.getElementById('d-hpp').value = '';
+  document.getElementById('d-harga-normal').value = '';
+  document.getElementById('d-diskon').value = '10';
+  document.getElementById('d-platform-fee').value = '0';
+  document.getElementById('diskon-result').style.display = 'none';
+  showToast('🔄 Form direset');
+}
+
+function resetFormBundling() {
+  document.getElementById('bundling-nama-promo').value = '';
+  document.getElementById('bundling-tgl-mulai').value = '';
+  document.getElementById('bundling-tgl-selesai').value = '';
+  // Reset bundle items to default 2 items
+  bundleCount = 0;
+  tambahBundleItem();
+  tambahBundleItem();
+  showToast('🔄 Form direset');
+}
+
+function resetFormBeliGratis() {
+  document.getElementById('beli-gratis-nama-promo').value = '';
+  document.getElementById('beli-gratis-tgl-mulai').value = '';
+  document.getElementById('beli-gratis-tgl-selesai').value = '';
+  document.getElementById('bg-menu-select').value = '';
+  document.getElementById('bg-beli').value = '2';
+  document.getElementById('bg-gratis').value = '1';
+  document.getElementById('bg-channel').value = '';
+  document.getElementById('bg-hpp').value = '';
+  document.getElementById('bg-harga').value = '';
+  document.getElementById('bg-fee').value = '20';
+  document.getElementById('bg-transaksi').value = '10';
+  document.getElementById('bg-fee-row').style.display = 'none';
+  document.getElementById('beli-gratis-result').style.display = 'none';
+  document.getElementById('beli-gratis-result').innerHTML = '';
+  showToast('🔄 Form direset');
+}
+
+function editPromo(promoId) {
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  const idx = promos.findIndex(p => p.id == promoId);
+  const promo = promos[idx];
+  if (!promo) return;
+  
+  const nama = prompt('Nama promo:', promo.nama);
+  if (!nama) return;
+  
+  const mulai = prompt('Tanggal mulai (YYYY-MM-DD):', promo.periodeMulai);
+  if (!mulai) return;
+  
+  const selesai = prompt('Tanggal selesai (YYYY-MM-DD):', promo.periodeSelesai);
+  if (!selesai) return;
+  
+  promo.nama = nama;
+  promo.periodeMulai = mulai;
+  promo.periodeSelesai = selesai;
+  
+  promos[idx] = promo;
+  localStorage.setItem('kedaiHeula_promos', JSON.stringify(promos));
+  
+  showToast('✅ Promo diupdate!');
+  renderPromoList();
+  syncPromosToCloud();
+}
+
+function hapusPromo(promoId) {
+  showKonfirmasi({
+    icon: '🗑️',
+    title: 'Hapus Promo?',
+    message: 'Promo ini akan dihapus permanen dari daftar.',
+    labelOk: 'Ya, Hapus',
+    onOk: () => {
+      const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+      const filtered = promos.filter(p => p.id != promoId);
+      localStorage.setItem('kedaiHeula_promos', JSON.stringify(filtered));
+      showToast('🗑️ Promo dihapus');
+      renderPromoList();
+      refreshPromoDropdown();
+      syncPromosToCloud();
+    }
+  });
+}
+
+function exportPromosPDF() {
+  showToast('📄 Export PDF coming soon...');
+  // TODO: Implement PDF export
+}
+
+function syncPromosToCloud() {
+  const sheetsURL = localStorage.getItem('kedaiHeula_sheetsURL');
+  if (!sheetsURL) return;
+  
+  const promos = JSON.parse(localStorage.getItem('kedaiHeula_promos') || '[]');
+  
+  fetch(sheetsURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'syncPromos',
+      data: promos
+    })
+  }).catch(err => console.error('Sync error:', err));
 }
 
 // =====================
 // HELPERS
-// =====================
-// =====================
+
 // HELPER FUNCTIONS
 // =====================
 
@@ -2999,6 +4092,13 @@ function formatRp(num) {
   return 'Rp ' + Math.round(num).toLocaleString('id-ID');
 }
 
+function formatTanggal(dateStr) {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return date.toLocaleDateString('id-ID', options);
+}
+
 function getCategoryLabel(cat) {
   const map = { takoyaki: '🐙 Takoyaki', dimsum: '🥟 Dimsum', ayam: '🍗 Ayam Crispy', lainnya: '🍱 Lainnya' };
   return map[cat] || cat;
@@ -3009,22 +4109,95 @@ function getCategoryEmoji(cat) {
   return map[cat] || '🍽️';
 }
 
-function pilihHarga(el, type) {
-  // Reset semua border di row yang sama
-  const parent = el.parentElement;
-  parent.querySelectorAll('.price-option').forEach(p => {
-    p.style.borderColor = '#D1FAE5';
-    p.style.background = '#FFFAF5';
+// State untuk pilihan harga
+let selectedMargin = 50;
+let selectedChannel = 'offline';
+let selectedHargaJual = 0;
+
+function pilihKategoriHarga(margin) {
+  selectedMargin = margin;
+  
+  // Reset highlight semua tombol kategori
+  [30, 50, 70].forEach(m => {
+    const btn = document.getElementById('btn-kategori-' + m);
+    if (!btn) return;
+    if (m === 30) { btn.style.boxShadow = ''; btn.style.transform = ''; btn.style.borderColor = '#F5C518'; }
+    if (m === 50) { btn.style.boxShadow = ''; btn.style.transform = ''; btn.style.borderColor = '#27AE60'; }
+    if (m === 70) { btn.style.boxShadow = ''; btn.style.transform = ''; btn.style.borderColor = '#E03027'; }
   });
   
-  // Highlight yang diklik
-  el.style.borderColor = 'var(--green)';
-  el.style.background = '#F0FDF4';
+  // Highlight tombol terpilih
+  const selected = document.getElementById('btn-kategori-' + margin);
+  if (selected) {
+    selected.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    selected.style.transform = 'scale(1.05)';
+  }
+
+  // Tampilkan channel selector
+  document.getElementById('channel-selector').style.display = 'block';
   
-  // Toast feedback
-  const margin = el.getAttribute('data-margin');
-  const typeLabel = type === 'online' ? 'Online (GoFood/Shopee)' : 'Offline';
-  showToast(`✅ Dipilih: ${typeLabel} - Margin ${margin}%`);
+  // Update tampilan harga jika channel sudah dipilih
+  updateHargaTerpilih();
+}
+
+function pilihChannelHarga(channel) {
+  selectedChannel = channel;
+
+  // Reset highlight tombol channel
+  ['offline', 'online'].forEach(c => {
+    const btn = document.getElementById('btn-channel-' + c);
+    if (btn) {
+      btn.style.background = 'var(--card)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = '';
+    }
+  });
+
+  // Highlight yang dipilih
+  const sel = document.getElementById('btn-channel-' + channel);
+  if (sel) {
+    sel.style.background = channel === 'online' ? '#E8F5E9' : '#EFF8FF';
+    sel.style.borderColor = channel === 'online' ? '#27AE60' : '#2196F3';
+  }
+
+  updateHargaTerpilih();
+}
+
+function updateHargaTerpilih() {
+  const hargaEl = document.getElementById('harga-terpilih-display');
+  const nilaiEl = document.getElementById('harga-terpilih-nilai');
+  const labelEl = document.getElementById('harga-terpilih-label');
+  const infoEl  = document.getElementById('harga-terpilih-info');
+
+  if (!hargaEl || !nilaiEl) return;
+
+  // Ambil nilai dari hidden input
+  const offlineVal = parseFloat(document.getElementById('harga-' + selectedMargin + '-offline').value) || 0;
+  const onlineVal  = parseFloat(document.getElementById('harga-' + selectedMargin + '-online').value) || 0;
+
+  if (offlineVal === 0 && onlineVal === 0) return; // Belum ada data HPP
+
+  const harga = selectedChannel === 'online' ? onlineVal : offlineVal;
+  const hpp = lastHPP || 0;
+  const profitPerPcs = selectedChannel === 'online'
+    ? Math.round(harga * (1 - 0.20)) - hpp  // estimasi setelah fee 20%
+    : harga - hpp;
+
+  const kategoriLabel = selectedMargin === 30 ? '🟡 EKONOMIS' : selectedMargin === 50 ? '🟢 STANDAR' : '🔥 PREMIUM';
+  const channelLabel  = selectedChannel === 'online' ? '📱 Online (GoFood/Shopee)' : '🏪 Offline';
+
+  labelEl.textContent = `${kategoriLabel} · ${channelLabel}`;
+  nilaiEl.textContent = formatRp(harga);
+  infoEl.textContent  = `Profit: ${formatRp(profitPerPcs)}/pcs · Margin ${selectedMargin}%${selectedChannel === 'online' ? ' (setelah fee ~20%)' : ''}`;
+
+  hargaEl.style.display = 'block';
+
+  // Simpan ke selectedHargaJual untuk dipakai saat simpanMenu
+  selectedHargaJual = harga;
+}
+
+function pilihHarga(el, type) {
+  // Fungsi lama — sekarang tidak dipakai tapi tetap ada untuk backward compat
 }
 
 function resetForm() {
@@ -3040,17 +4213,32 @@ function resetForm() {
   document.getElementById('preview-foto').innerHTML = '';
   currentFotoBase64 = null;
   
+  // Reset pilihan harga
+  selectedHargaJual = 0;
+  selectedMargin = 50;
+  selectedChannel = 'offline';
+  const channelSel = document.getElementById('channel-selector');
+  if (channelSel) channelSel.style.display = 'none';
+  const hargaDisp = document.getElementById('harga-terpilih-display');
+  if (hargaDisp) hargaDisp.style.display = 'none';
+  
   bahanCount = 0; biayaCount = 0;
   tambahBahan(); tambahBahan(); tambahBahan();
   tambahBiaya();
 }
 
 function konfirmasiMenuBaru() {
-  if (confirm('Reset form untuk input menu baru?\nData yang belum disimpan ke Ringkasan akan hilang.')) {
-    resetForm();
-    lastSnapshot = {};
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  showKonfirmasi({
+    icon: '➕',
+    title: 'Input Menu Baru?',
+    message: 'Reset form untuk menu baru. Data yang belum disimpan ke Ringkasan akan hilang.',
+    labelOk: 'Ya, Reset Form',
+    onOk: () => {
+      resetForm();
+      lastSnapshot = {};
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
 }
 
 function cetakHasil() {
@@ -3065,6 +4253,154 @@ function showToast(msg) {
 }
 
 // =====================
+// MODAL KONFIRMASI CUSTOM
+// =====================
+let _konfirmasiCallback = null;
+
+function showKonfirmasi({ icon = '⚠️', title = 'Konfirmasi', message = 'Yakin?', labelOk = 'Ya, Lanjutkan', onOk }) {
+  _konfirmasiCallback = onOk;
+  document.getElementById('konfirmasi-icon').textContent = icon;
+  document.getElementById('konfirmasi-title').textContent = title;
+  document.getElementById('konfirmasi-message').textContent = message;
+  document.getElementById('konfirmasi-ok').textContent = labelOk;
+  document.getElementById('modal-konfirmasi').style.display = 'flex';
+}
+
+function tutupKonfirmasi() {
+  document.getElementById('modal-konfirmasi').style.display = 'none';
+  _konfirmasiCallback = null;
+}
+
+function eksekusiKonfirmasi() {
+  document.getElementById('modal-konfirmasi').style.display = 'none';
+  if (_konfirmasiCallback) _konfirmasiCallback();
+  _konfirmasiCallback = null;
+}
+
+// =====================
+// MODAL NOTA / DETAIL ORDER
+// =====================
+let _notaTransaksi = null;
+
+function lihatNota(transaksiObj) {
+  _notaTransaksi = transaksiObj;
+  renderNotaBody(transaksiObj);
+  document.getElementById('modal-nota').style.display = 'flex';
+}
+
+function tutupNota() {
+  document.getElementById('modal-nota').style.display = 'none';
+}
+
+function renderNotaBody(t) {
+  const tglDisplay = new Date(t.timestamp).toLocaleString('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  let itemRows = '';
+  t.items.forEach(item => {
+    itemRows += `
+      <div style="display:flex;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed var(--border);">
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:14px;">${item.nama}</div>
+          <div style="font-size:12px;color:var(--muted);">${formatRp(item.harga)} × ${item.qty}</div>
+        </div>
+        <div style="font-weight:800;font-size:14px;">${formatRp(item.subtotal)}</div>
+      </div>`;
+  });
+
+  const profit = t.items.reduce((s, i) => s + (i.profit || 0), 0);
+
+  document.getElementById('nota-body').innerHTML = `
+    <!-- Header Nota -->
+    <div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid var(--border);">
+      <div style="font-family:'Fredoka One',cursive;font-size:24px;color:var(--red);">🍱 Kedai Heula</div>
+      <div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:4px;">Jajanan Mantap Pisan!</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">📅 ${tglDisplay}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">#${t.id}</div>
+    </div>
+
+    <!-- Item List -->
+    <div style="margin-bottom:16px;">${itemRows}</div>
+
+    <!-- Summary -->
+    <div style="background:var(--bg);border-radius:12px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:15px;font-weight:800;">
+        <span>Total</span>
+        <span style="color:var(--red);">${formatRp(t.total)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;color:var(--muted);font-weight:700;">
+        <span>💵 Dibayar</span>
+        <span>${formatRp(t.bayar)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--green);font-weight:700;">
+        <span>💰 Kembalian</span>
+        <span>${formatRp(t.kembalian)}</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted);font-weight:700;">
+      — Terima kasih sudah belanja! —
+    </div>
+  `;
+}
+
+function printNota() {
+  if (!_notaTransaksi) return;
+  const t = _notaTransaksi;
+  const tglDisplay = new Date(t.timestamp).toLocaleString('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  let itemRows = t.items.map(item => `
+    <tr>
+      <td style="padding:4px 0;">${item.nama}</td>
+      <td style="text-align:center;padding:4px 6px;">${item.qty}x</td>
+      <td style="text-align:right;padding:4px 0;">${formatRp(item.harga)}</td>
+      <td style="text-align:right;padding:4px 0;font-weight:700;">${formatRp(item.subtotal)}</td>
+    </tr>`).join('');
+
+  const printContent = `
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Courier New', monospace; font-size: 12px; width: 80mm; }
+      .center { text-align: center; }
+      .bold { font-weight: bold; }
+      .line { border-top: 1px dashed #000; margin: 6px 0; }
+      table { width: 100%; border-collapse: collapse; }
+      .total-row td { font-weight: bold; font-size: 14px; border-top: 1px solid #000; padding-top: 4px; }
+    </style>
+    <div class="center bold" style="font-size:16px;margin-bottom:4px;">KEDAI HEULA</div>
+    <div class="center" style="font-size:10px;margin-bottom:2px;">Jajanan Mantap Pisan!</div>
+    <div class="center" style="font-size:10px;">${tglDisplay}</div>
+    <div class="center" style="font-size:10px;margin-bottom:6px;">#${t.id}</div>
+    <div class="line"></div>
+    <table>
+      <tbody>${itemRows}</tbody>
+      <tr class="total-row">
+        <td colspan="3">TOTAL</td>
+        <td style="text-align:right;">${formatRp(t.total)}</td>
+      </tr>
+    </table>
+    <div class="line"></div>
+    <table>
+      <tr><td>Dibayar</td><td style="text-align:right;">${formatRp(t.bayar)}</td></tr>
+      <tr><td>Kembalian</td><td style="text-align:right;font-weight:bold;">${formatRp(t.kembalian)}</td></tr>
+    </table>
+    <div class="line"></div>
+    <div class="center" style="margin-top:8px;font-size:11px;">-- Terima kasih! --</div>
+  `;
+
+  const printArea = document.getElementById('print-area');
+  printArea.innerHTML = printContent;
+  window.print();
+}
+
+// =====================
 // PROMO - SWITCH PANEL
 // =====================
 let bundleCount = 0;
@@ -3076,6 +4412,7 @@ function switchPromo(type, el) {
   document.getElementById('panel-' + type).classList.add('active');
   if (type === 'diskon') refreshDropdownDiskon();
   if (type === 'bundling') refreshAllBundleDropdowns();
+  if (type === 'aktif') renderPromoList('all');
 }
 
 function refreshAllBundleDropdowns() {
@@ -3215,6 +4552,10 @@ function hitungDiskon() {
       </div>
     </div>
   `;
+  
+  // Show form simpan promo
+  const formSimpan = document.getElementById('form-simpan-diskon');
+  if (formSimpan) formSimpan.style.display = 'block';
 }
 
 // =====================
@@ -3335,6 +4676,14 @@ function hitungBundling() {
   const profitOnlineHemat = (onlineHemat * (1 - platformFee/100)) - totalHPP;
   const profitOnlineStandar = (onlineStandar * (1 - platformFee/100)) - totalHPP;
   const profitOnlinePremium = (onlinePremium * (1 - platformFee/100)) - totalHPP;
+  
+  // Save to global for form populate
+  bundlingHargaData = {
+    offlineHemat, offlineStandar, offlinePremium,
+    onlineHemat, onlineStandar, onlinePremium,
+    profitOfflineHemat, profitOfflineStandar, profitOfflinePremium,
+    profitOnlineHemat, profitOnlineStandar, profitOnlinePremium
+  };
 
   const normalInfo = totalHargaJualNormal > 0
     ? `<div style="font-size:12px;color:#666;margin-bottom:12px;">💰 Total harga satuan: <strong>${formatRp(totalHargaJualNormal)}</strong> → hemat <strong>${formatRp(totalHargaJualNormal - offlineStandar)}</strong> dengan paket standar</div>`
@@ -3344,66 +4693,6 @@ function hitungBundling() {
   el.style.display = 'block';
   el.innerHTML = `
     ${normalInfo}
-    
-    <div style="background:#FFF3E0;border-left:4px solid #FF9800;padding:14px;border-radius:8px;margin-bottom:12px;">
-      <div style="font-weight:800;color:#E65100;margin-bottom:10px;">💡 Rekomendasi Harga Bundling</div>
-      
-      <!-- Header kolom -->
-      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px;font-weight:700;color:#666;">
-        <div></div>
-        <div style="text-align:center;">🏪 OFFLINE</div>
-        <div style="text-align:center;">📱 ONLINE<br><span style="font-size:9px;font-weight:400;">(GoFood/Shopee)</span></div>
-      </div>
-
-      <!-- Row 1: Hemat -->
-      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
-          🟡 HEMAT<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~10%</span>
-        </div>
-        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
-          <div style="font-weight:800;color:#E65100;font-size:16px;">${formatRp(offlineHemat)}</div>
-          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflineHemat)}</div>
-        </div>
-        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
-          <div style="font-weight:800;color:#E65100;font-size:16px;">${formatRp(onlineHemat)}</div>
-          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlineHemat)}</div>
-        </div>
-      </div>
-
-      <!-- Row 2: Standar (recommended) -->
-      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
-          🟢 STANDAR<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~25%</span>
-        </div>
-        <div style="background:#E8F5E9;padding:10px;border-radius:8px;text-align:center;border:2px solid #4CAF50;">
-          <div style="font-weight:800;color:#2E7D32;font-size:16px;">${formatRp(offlineStandar)}</div>
-          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflineStandar)}</div>
-        </div>
-        <div style="background:#E8F5E9;padding:10px;border-radius:8px;text-align:center;border:2px solid #4CAF50;">
-          <div style="font-weight:800;color:#2E7D32;font-size:16px;">${formatRp(onlineStandar)}</div>
-          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlineStandar)}</div>
-        </div>
-      </div>
-
-      <!-- Row 3: Premium -->
-      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;">
-        <div style="display:flex;align-items:center;font-weight:700;font-size:12px;color:#666;">
-          🔥 PREMIUM<br><span style="font-size:10px;font-weight:400;color:#999;">Margin ~35%</span>
-        </div>
-        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
-          <div style="font-weight:800;color:#1976D2;font-size:16px;">${formatRp(offlinePremium)}</div>
-          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOfflinePremium)}</div>
-        </div>
-        <div style="background:#FFFAF5;padding:10px;border-radius:8px;text-align:center;border:2px solid #eee;">
-          <div style="font-weight:800;color:#1976D2;font-size:16px;">${formatRp(onlinePremium)}</div>
-          <div style="font-size:10px;color:#666;margin-top:2px;">Profit: ${formatRp(profitOnlinePremium)}</div>
-        </div>
-      </div>
-
-      <div style="font-size:11px;color:#666;margin-top:10px;padding-top:10px;border-top:1px solid #ddd;">
-        ℹ️ <strong>Harga online 25% lebih tinggi</strong> untuk cover platform fee ~20%. Profit tetap sama antara offline & online.
-      </div>
-    </div>
     
     <div class="card">
       <div class="card-title" style="margin-bottom:12px;">🔍 Detail Item Bundling</div>
@@ -3434,118 +4723,81 @@ function hitungBundling() {
       </table>
     </div>
   `;
-}
-
-// =====================
-// PROMO - BELI X GRATIS Y
-// =====================
-function hitungBeliGratis() {
-  // Gunakan harga jual normal aktual kalau tersedia, fallback ke estimasi margin 50%
-  const hargaNormalRef = totalHargaJualNormal > 0 ? totalHargaJualNormal : totalHPP / (1 - 0.5);
-  const diskonEfektif = hargaNormalRef > 0 ? ((hargaNormalRef - hargaPaket) / hargaNormalRef) * 100 : 0;
-
-  const isProfit = profit > 0;
-  const isWarning = profit >= 0 && margin < 15;
-  let boxClass = !isProfit ? 'danger' : isWarning ? 'warning' : 'profit';
-
-  let verdict = '';
-  if (!isProfit) {
-    verdict = `⚠️ <strong>Harga paket terlalu murah!</strong> Kamu rugi ${formatRp(Math.abs(profit))} per transaksi. Naikkan harga paket minimal <strong>${formatRp(Math.ceil(totalHPP / (1 - platformFee / 100)))}</strong> buat balik modal.`;
-  } else if (isWarning) {
-    verdict = `😬 <strong>Margin tipis (${margin.toFixed(1)}%).</strong> Masih untung tapi mepet. Cocok buat promo perdana/launching, tapi jangan jadi harga tetap ya.`;
-  } else {
-    const diskonStr = diskonEfektif > 0 ? `~${Math.abs(diskonEfektif).toFixed(0)}% lebih murah dari beli satuan` : 'lebih hemat dari beli satuan';
-    verdict = `✅ <strong>Bundling ini sehat!</strong> Margin ${margin.toFixed(1)}% — paket ini ${diskonStr}. Pelanggan senang, kamu tetap untung!`;
+  
+  // Populate pilihan harga bundling  
+  const hargaOptions = document.getElementById('bundling-harga-options');
+  if (hargaOptions) {
+    hargaOptions.innerHTML = `
+      <label style="border:2px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;" onclick="selectBundlingHarga(this.querySelector('input'))">
+        <input type="radio" name="bundling-harga-promo" value="${offlineHemat}" data-label="Offline Hemat ~10%" style="cursor:pointer;" />
+        <div>
+          <div style="font-weight:700;">🟡 Offline Hemat</div>
+          <div style="color:var(--orange);">${formatRp(offlineHemat)}</div>
+          <div style="font-size:11px;color:var(--muted);">Profit: ${formatRp(profitOfflineHemat)}</div>
+        </div>
+      </label>
+      <label style="border:2px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;" onclick="selectBundlingHarga(this.querySelector('input'))">
+        <input type="radio" name="bundling-harga-promo" value="${onlineHemat}" data-label="Online Hemat ~10%" style="cursor:pointer;" />
+        <div>
+          <div style="font-weight:700;">📱 Online Hemat</div>
+          <div style="color:var(--orange);">${formatRp(onlineHemat)}</div>
+          <div style="font-size:11px;color:var(--muted);">Profit: ${formatRp(profitOnlineHemat)}</div>
+        </div>
+      </label>
+      <label style="border:2px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;" onclick="selectBundlingHarga(this.querySelector('input'))">
+        <input type="radio" name="bundling-harga-promo" value="${offlineStandar}" data-label="Offline Standar ~25%" style="cursor:pointer;" />
+        <div>
+          <div style="font-weight:700;">🟢 Offline Standar</div>
+          <div style="color:var(--green);">${formatRp(offlineStandar)}</div>
+          <div style="font-size:11px;color:var(--muted);">Profit: ${formatRp(profitOfflineStandar)}</div>
+        </div>
+      </label>
+      <label style="border:2px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;" onclick="selectBundlingHarga(this.querySelector('input'))">
+        <input type="radio" name="bundling-harga-promo" value="${onlineStandar}" data-label="Online Standar ~25%" style="cursor:pointer;" />
+        <div>
+          <div style="font-weight:700;">📱 Online Standar</div>
+          <div style="color:var(--green);">${formatRp(onlineStandar)}</div>
+          <div style="font-size:11px;color:var(--muted);">Profit: ${formatRp(profitOnlineStandar)}</div>
+        </div>
+      </label>
+      <label style="border:2px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;" onclick="selectBundlingHarga(this.querySelector('input'))">
+        <input type="radio" name="bundling-harga-promo" value="${offlinePremium}" data-label="Offline Premium ~35%" style="cursor:pointer;" />
+        <div>
+          <div style="font-weight:700;">🔥 Offline Premium</div>
+          <div style="color:var(--red);">${formatRp(offlinePremium)}</div>
+          <div style="font-size:11px;color:var(--muted);">Profit: ${formatRp(profitOfflinePremium)}</div>
+        </div>
+      </label>
+      <label style="border:2px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;" onclick="selectBundlingHarga(this.querySelector('input'))">
+        <input type="radio" name="bundling-harga-promo" value="${onlinePremium}" data-label="Online Premium ~35%" style="cursor:pointer;" />
+        <div>
+          <div style="font-weight:700;">📱 Online Premium</div>
+          <div style="color:var(--red);">${formatRp(onlinePremium)}</div>
+          <div style="font-size:11px;color:var(--muted);">Profit: ${formatRp(profitOnlinePremium)}</div>
+        </div>
+      </label>
+    `;
   }
-
-  let itemRows = itemDetail.map(i => `
-    <tr>
-      <td>${i.nama}</td>
-      <td class="text-right">${i.qty}x</td>
-      <td class="text-right">${formatRp(i.hpp)}</td>
-      <td class="text-right">${i.hj > 0 ? formatRp(i.hj) : '<span style="color:var(--muted)">—</span>'}</td>
-      <td class="text-right">${formatRp(i.subtotalHPP)}</td>
-    </tr>`).join('');
-
-  const normalInfo = totalHargaJualNormal > 0
-    ? `<span style="font-size:12px;opacity:0.85;">Harga jual normal: <strong>${formatRp(totalHargaJualNormal)}</strong> → hemat <strong>${formatRp(totalHargaJualNormal - hargaPaket)}</strong></span>`
-    : '';
-
-  const el = document.getElementById('bundling-result');
-  el.style.display = 'block';
-  el.innerHTML = `
-    <div class="promo-result-box ${boxClass}">
-      <div style="font-family:'Fredoka One',cursive;font-size:17px;margin-bottom:4px;">📦 Hasil Simulasi Bundling</div>
-      ${normalInfo}
-      <div class="promo-result-grid" style="margin-top:12px;">
-        <div class="promo-result-item">
-          <span class="pri-label">Total HPP Paket</span>
-          <div class="pri-value">${formatRp(totalHPP)}</div>
-        </div>
-        <div class="promo-result-item">
-          <span class="pri-label">Harga Jual Paket</span>
-          <div class="pri-value">${formatRp(hargaPaket)}</div>
-          ${diskonEfektif > 0 ? `<div class="pri-sub">diskon efektif ${diskonEfektif.toFixed(0)}%</div>` : ''}
-        </div>
-        <div class="promo-result-item">
-          <span class="pri-label">Pendapatan Bersih</span>
-          <div class="pri-value">${formatRp(pendapatanBersih)}</div>
-          <div class="pri-sub">setelah fee ${platformFee}%</div>
-        </div>
-        <div class="promo-result-item">
-          <span class="pri-label">Profit per Transaksi</span>
-          <div class="pri-value">${profit >= 0 ? '+' : ''}${formatRp(profit)}</div>
-          <div class="pri-sub">margin ${margin.toFixed(1)}%</div>
-        </div>
-      </div>
-      <div class="verdict-box">
-        <div class="verdict-title">Verdict</div>
-        ${verdict}
-      </div>
-    </div>
-    <div class="card" style="margin-top:12px;">
-      <div class="card-title" style="margin-bottom:12px;">🔍 Detail Item Bundling</div>
-      <table class="breakdown-table">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th class="text-right">Qty</th>
-            <th class="text-right">HPP/pcs</th>
-            <th class="text-right">Harga Jual/pcs</th>
-            <th class="text-right">Subtotal HPP</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemRows}
-          <tr class="total-row">
-            <td colspan="2"><strong>TOTAL</strong></td>
-            <td></td>
-            <td class="text-right"><strong>${totalHargaJualNormal > 0 ? formatRp(totalHargaJualNormal) : '—'}</strong></td>
-            <td class="text-right"><strong>${formatRp(totalHPP)}</strong></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  `;
 }
+
 
 // =====================
 // PROMO - BELI X GRATIS Y
 // =====================
 function refreshDropdownBeliGratis() {
+  // Populate dropdown menu untuk Beli X Gratis Y
+  const menuData = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
   const sel = document.getElementById('bg-menu-select');
   if (!sel) return;
   
-  const data = JSON.parse(localStorage.getItem('kedaiHeula_menu') || '[]');
-  let opts = '<option value="">🔍 Pilih dari Ringkasan Menu...</option>';
-  
-  data.forEach((m, i) => {
-    opts += `<option value="${i}">${getCategoryEmoji(m.kategori)} ${m.nama} — HPP: ${formatRp(m.hpp)} | Jual: ${formatRp(m.hargaJual)}</option>`;
+  let html = '<option value="">-- Pilih Menu --</option>';
+  menuData.forEach((m, idx) => {
+    html += `<option value="${idx}">${m.nama} - ${formatRp(m.hargaJual || 0)}</option>`;
   });
-  
-  if (data.length === 0) opts += '<option value="" disabled>⚠️ Belum ada menu tersimpan</option>';
-  sel.innerHTML = opts;
+  sel.innerHTML = html;
 }
+
+  
 
 function isiBeliGratis() {
   const sel = document.getElementById('bg-menu-select');
@@ -3566,14 +4818,14 @@ function toggleBeliGratisChannel() {
   const channel = document.getElementById('bg-channel').value;
   const feeRow = document.getElementById('bg-fee-row');
   
-  if (channel === 'offline') {
-    // Offline - hide platform fee
-    if (feeRow) feeRow.style.display = 'none';
-    document.getElementById('bg-fee').value = 0;
-  } else {
+  if (channel === 'online') {
     // Online - show platform fee
     if (feeRow) feeRow.style.display = 'grid';
     document.getElementById('bg-fee').value = 20;
+  } else {
+    // Offline or neutral - hide platform fee
+    if (feeRow) feeRow.style.display = 'none';
+    document.getElementById('bg-fee').value = 0;
   }
   
   hitungBeliGratis();
@@ -3655,6 +4907,10 @@ function hitungBeliGratis() {
       </div>
     </div>
   `;
+  
+  // Show form simpan promo
+  const formBeliGratis = document.getElementById('form-simpan-beli-gratis');
+  if (formBeliGratis) formBeliGratis.style.display = 'block';
 }
 
 // =====================
@@ -3821,7 +5077,14 @@ async function restoreFromSheets() {
     confirmMsg += '\n\nData lokal kosong, akan diisi dari cloud.';
   }
   
-  if (!confirm(confirmMsg)) return;
+  showKonfirmasi({
+    icon: '☁️',
+    title: 'Restore dari Cloud?',
+    message: lokalCount > 0
+      ? `Data lokal: ${lokalCount} menu. Data cloud akan digabung (tidak menghapus data lokal).`
+      : 'Data lokal kosong. Data akan diisi dari cloud.',
+    labelOk: 'Ya, Restore',
+    onOk: async () => {
 
   const btnRestore = document.getElementById('btn-restore');
   const origText = btnRestore.innerHTML;
@@ -3877,14 +5140,12 @@ async function restoreFromSheets() {
     btnRestore.innerHTML = origText;
     btnRestore.disabled = false;
   }
+  } // end onOk
+  }); // end showKonfirmasi
 }
 
 // =====================
-// LAPORAN PENJUALAN
-// =====================
 
-let currentPeriode = 'hari';
-let chartProfit = null;
 
 function initLaporan() {
   // Set tanggal hari ini (WIB)
@@ -4296,31 +5557,35 @@ function syncTransaksiKeSheets() {
     return;
   }
 
-  if (!confirm(`Backup ${allTransaksi.length} transaksi ke Google Sheets?`)) return;
-
-  const origText = 'Menyimpan...';
-  showToast('☁️ ' + origText);
-
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: 'backup_transaksi', data: allTransaksi })
-  })
-  .then(res => res.json())
-  .then(result => {
-    if (result.status === 'ok') {
-      const now = getWIBDateTimeString();
-      localStorage.setItem('kedaiHeula_lastSyncTransaksi', now);
-      showToast(`✅ Backup transaksi berhasil! ${allTransaksi.length} transaksi tersimpan.`);
-    } else {
-      throw new Error(result.message || 'Unknown error');
+  showKonfirmasi({
+    icon: '☁️',
+    title: 'Backup Transaksi?',
+    message: `${allTransaksi.length} transaksi akan di-backup ke Google Sheets.`,
+    labelOk: 'Ya, Backup',
+    onOk: () => {
+      showToast('☁️ Menyimpan...');
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'backup_transaksi', data: allTransaksi })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.status === 'ok') {
+          const now = getWIBDateTimeString();
+          localStorage.setItem('kedaiHeula_lastSyncTransaksi', now);
+          showToast(`✅ Backup transaksi berhasil! ${allTransaksi.length} transaksi tersimpan.`);
+        } else {
+          throw new Error(result.message || 'Unknown error');
+        }
+      })
+      .catch(e => {
+        showToast('❌ Gagal backup transaksi: ' + e.message);
+        console.error(e);
+      });
     }
-  })
-  .catch(e => {
-    showToast('❌ Gagal backup transaksi: ' + e.message);
-    console.error(e);
   });
-}
+} // end backupTransaksi
 
 async function restoreTransaksiFromSheets() {
   const url = getSheetsUrl();
@@ -4332,14 +5597,16 @@ async function restoreTransaksiFromSheets() {
   const lokal = JSON.parse(localStorage.getItem('kedaiHeula_transaksi') || '[]');
   const lokalCount = lokal.length;
   
-  let confirmMsg = 'Restore transaksi dari Google Sheets?';
-  if (lokalCount > 0) {
-    confirmMsg += `\n\nData lokal: ${lokalCount} transaksi.\nData akan digabung (tidak dihapus).`;
-  } else {
-    confirmMsg += '\n\nData lokal kosong, akan diisi dari cloud.';
-  }
-  
-  if (!confirm(confirmMsg)) return;
+  const pesanConfirm = lokalCount > 0
+    ? `Data lokal: ${lokalCount} transaksi. Data cloud akan digabung (tidak menghapus data lokal).`
+    : 'Data lokal kosong. Data akan diisi dari cloud.';
+
+  showKonfirmasi({
+    icon: '☁️',
+    title: 'Restore Transaksi?',
+    message: pesanConfirm,
+    labelOk: 'Ya, Restore',
+    onOk: async () => {
 
   showToast('⏳ Memuat transaksi dari cloud...');
 
@@ -4389,6 +5656,9 @@ async function restoreTransaksiFromSheets() {
     showToast('❌ Gagal restore: ' + e.message);
     console.error('Restore error:', e);
   }
+
+  } // end onOk
+  }); // end showKonfirmasi
 }
 
 function exportLaporanPDF() {
